@@ -958,12 +958,16 @@ export default class Sheet {
   }
 
   undo() {
-    this.data.undo();
+    this.data.undo(() => {
+      this.trigger('undo-performed');
+    });
     sheetReset.call(this);
   }
 
   redo() {
-    this.data.redo();
+    this.data.redo(() => {
+      this.trigger('redo-performed');
+    });
     sheetReset.call(this);
   }
 

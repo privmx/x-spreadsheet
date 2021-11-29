@@ -388,15 +388,23 @@ export default class DataProxy {
     return this.history.canRedo();
   }
 
-  undo() {
+  undo(cb) {
     this.history.undo(this.getData(), (d) => {
       this.setData(d);
+      this.change(this.getData());
+      if (cb) {
+        cb();
+      }
     });
   }
 
-  redo() {
+  redo(cb) {
     this.history.redo(this.getData(), (d) => {
       this.setData(d);
+      this.change(this.getData());
+      if (cb) {
+        cb();
+      }
     });
   }
 
