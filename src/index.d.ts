@@ -50,6 +50,8 @@ declare module 'x-data-spreadsheet' {
   export type CELL_SELECTED = 'cell-selected';
   export type CELLS_SELECTED = 'cells-selected';
   export type CELL_EDITED = 'cell-edited';
+  export type UNDO_PERFORMED = 'undo-performed';
+  export type REDO_PERFORMED = 'redo-performed';
 
   export type CellMerge = [number, number];
 
@@ -68,6 +70,14 @@ declare module 'x-data-spreadsheet' {
     (
       evnt: CELL_EDITED,
       callback: (text: string, rowIndex: number, colIndex: number) => void
+    ): void;
+    (
+      evnt: UNDO_PERFORMED,
+      callback: () => void
+    ): void;
+    (
+      evnt: REDO_PERFORMED,
+      callback: () => void
     ): void;
   }
 
