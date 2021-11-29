@@ -53,6 +53,11 @@ function keydownEventHandler(evt) {
     evt.stopPropagation();
   }
   if (keyCode === 13 && !altKey) evt.preventDefault();
+  if (keyCode === 27) {
+    this.inputText = this.initialText;
+    this.change('input', this.inputText);
+    this.clear();
+  }
 }
 
 function inputEventHandler(evt) {
@@ -209,6 +214,7 @@ export default class Editor {
     this.cell = null;
     this.areaOffset = null;
     this.inputText = '';
+    this.initialText = '';
     this.el.hide();
     this.textEl.val('');
     this.textlineEl.html('');
@@ -248,13 +254,14 @@ export default class Editor {
     }
   }
 
-  setCell(cell, validator) {
+  setCell(cell, validator, initialText) {
     // console.log('::', validator);
     const { el, datepicker, suggest } = this;
     el.show();
     this.cell = cell;
     const text = (cell && cell.text) || '';
     this.setText(text);
+    this.initialText = typeof(initialText) === "string" ? initialText : text;
 
     this.validator = validator;
     if (validator) {
