@@ -1,5 +1,6 @@
 import { expr2xy, xy2expr } from './alphabet';
 import { numberCalc } from './helper';
+import { formulam } from './formula';
 
 // Converting infix expression to a suffix expression
 // src: AVERAGE(SUM(A1,A2), B1) + 50 + B20
@@ -61,7 +62,12 @@ const infixExprToSuffixExpr = (src) => {
           } else {
             // console.log('c1:', c1, fnArgType, stack, operatorStack);
             while (c1 !== '(') {
-              stack.push(c1);
+              if (isFormulaName(c1)) {
+                stack.push([c1,1]);
+              }
+              else {
+                stack.push(c1);
+              }
               if (operatorStack.length <= 0) break;
               c1 = operatorStack.pop();
             }
@@ -83,9 +89,20 @@ const infixExprToSuffixExpr = (src) => {
           }
           fnArgType = 1;
           fnArgsLen += 1;
-        } else if (c === '(' && subStrs.length > 0) {
-          // function
-          operatorStack.push(subStrs.join(''));
+        } else if (c === '(') {
+          if (subStrs.length > 0) {
+            // function
+            operatorStack.push(subStrs.join(''));
+          }
+          else {
+            const startIdx = i + 1;
+            const endIdx = getClosingBracketIndex(src, startIdx);
+            if (endIdx >= 0) {
+              const inner = infixExprToSuffixExpr(src.substring(startIdx, endIdx));
+              i = endIdx;
+              stack.push(...inner);
+            }
+          }
         } else {
           // priority: */ > +-
           // console.log('xxxx:', operatorStack, c, stack);
@@ -117,6 +134,30 @@ const infixExprToSuffixExpr = (src) => {
     stack.push(operatorStack.pop());
   }
   return stack;
+};
+
+const isFormulaName = text => {
+  if (typeof(text) !== 'string') {
+    return false;
+  }
+  return text in formulam;
+};
+
+const getClosingBracketIndex = (str, startIdx) => {
+  let depth = 1;
+  for (let i = startIdx; i < str.length; ++i) {
+    const c = str[i];
+    if (c === ')') {
+      depth--;
+      if (depth === 0) {
+        return i;
+      }
+    }
+    else if (c === "(") {
+      depth++;
+    }
+  }
+  return -1;
 };
 
 const evalSubExpr = (subExpr, cellRender) => {
