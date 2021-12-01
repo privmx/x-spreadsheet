@@ -58,6 +58,18 @@ describe('infixExprToSuffixExpr', () => {
   it('should return SUM( when the value is SUM', () => {
     assert.equal(infixExprToSuffixExpr('SUM(').join(''), 'SUM');
   });
+  it('should return 432+* when the value is 4*(3+2)', () => {
+    assert.equal(infixExprToSuffixExpr('4*(3+2)').join(''), '432+*');
+  });
+  it('should return 5234+*+ when the value is 5+2*(3+4)', () => {
+    assert.equal(infixExprToSuffixExpr('5+2*(3+4)').join(''), '5234+*+');
+  });
+  it('should return 523416+*+*+ when the value is 5+2*(3+4*(1+6))', () => {
+    assert.equal(infixExprToSuffixExpr('5+2*(3+4*(1+6))').join(''), '523416+*+*+');
+  });
+  it('should return 5SUM,1 when the value is Sum(5)', () => {
+    assert.equal(infixExprToSuffixExpr('Sum(5)').join(''), '5SUM,1');
+  });
 });
 
 describe('cell', () => {
