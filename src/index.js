@@ -5,6 +5,7 @@ import Sheet from './component/sheet';
 import Bottombar from './component/bottombar';
 import { cssPrefix } from './config';
 import { locale } from './locale/locale';
+import { addCustomFormula } from './core/formula';
 import './index.less';
 
 
@@ -126,6 +127,10 @@ class Spreadsheet {
   static locale(lang, message) {
     locale(lang, message);
   }
+  
+  static addCustomFormula(key, title, render) {
+    addCustomFormula(key, title, render);
+  }
 }
 
 const spreadsheet = (el, options = {}) => new Spreadsheet(el, options);
@@ -133,6 +138,7 @@ const spreadsheet = (el, options = {}) => new Spreadsheet(el, options);
 if (window) {
   window.x_spreadsheet = spreadsheet;
   window.x_spreadsheet.locale = (lang, message) => locale(lang, message);
+  window.x_spreadsheet.addCustomFormula = (key, title, render) => addCustomFormula(key, title, render);
 }
 
 export default Spreadsheet;

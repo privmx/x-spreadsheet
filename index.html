@@ -13,6 +13,19 @@
   <div id="x-spreadsheet-demo"></div>
   <script>
     function load(){
+      x_spreadsheet.addCustomFormula('SQRT', 'Sqrt', arr => {
+        if (arr.length !== 1) {
+          return "!ARG";
+        }
+        let x = arr[0];
+        if (typeof(x) === "string") {
+          x = parseFloat(x);
+        }
+        if (typeof(x) !== 'number' || isNaN(x)) {
+          return "!ARG";
+        }
+        return Math.sqrt(x);
+      });
       const rows10 = { len: 1000 };
       for (let i = 0; i < 1000; i += 1) {
         rows10[i] = {

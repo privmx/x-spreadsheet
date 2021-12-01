@@ -91,8 +91,14 @@ baseFormulas.forEach((f) => {
 export default {
 };
 
+const addCustomFormula = (key, title, render) => {
+  formulas.push({ key, title: () => title, render });
+  formulam[key] = formulas[formulas.length - 1];
+};
+
 export {
   formulam,
   formulas,
   baseFormulas,
+  addCustomFormula,
 };

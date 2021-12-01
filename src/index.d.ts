@@ -209,6 +209,13 @@ declare module 'x-data-spreadsheet' {
      * @param message
      */
     static locale(lang: string, message: object): void;
+    /**
+     * add custom formula
+     * @param key
+     * @param title
+     * @param render
+     */
+    static addCustomFormula(key: string, title: string, render: (arr: (number|string)[]) => number|string): void;
   }
   global {
     interface Window {
