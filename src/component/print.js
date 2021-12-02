@@ -52,7 +52,7 @@ function pagerOrientationChange(evt) {
 }
 
 export default class Print {
-  constructor(data) {
+  constructor(data, spreadsheet) {
     this.paper = {
       w: inches2px(PAGER_SIZES[0][1]),
       h: inches2px(PAGER_SIZES[0][2]),
@@ -66,6 +66,7 @@ export default class Print {
       },
     };
     this.data = data;
+    this.spreadsheet = spreadsheet;
     this.el = h('div', `${cssPrefix}-print`)
       .children(
         h('div', `${cssPrefix}-print-bar`)
@@ -145,7 +146,7 @@ export default class Print {
         th += rh;
         if (th < iheight) {
           for (let ci = 0; ci <= cr.eci; ci += 1) {
-            renderCell(draw, data, ri, ci, yoffset);
+            renderCell(this.spreadsheet, draw, data, ri, ci, yoffset);
             mViewRange.eci = ci;
           }
         } else {
@@ -161,7 +162,7 @@ export default class Print {
       if (scale < 1) draw.scale(scale, scale);
       const yof = yoffset;
       data.eachMergesInView(mViewRange, ({ sri, sci }) => {
-        renderCell(draw, data, sri, sci, yof);
+        renderCell(this.spreadsheet, draw, data, sri, sci, yof);
       });
       draw.restore();
 

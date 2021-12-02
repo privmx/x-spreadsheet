@@ -182,7 +182,7 @@ const evalSubExpr = (subExpr, cellRender) => {
 // srcStack: <= infixExprToSufixExpr
 // formulaMap: {'SUM': {}, ...}
 // cellRender: (x, y) => {}
-const evalSuffixExpr = (srcStack, formulaMap, cellRender, cellList) => {
+const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList) => {
   const stack = [];
   // console.log(':::::formulaMap:', formulaMap);
   for (let i = 0; i < srcStack.length; i += 1) {
@@ -229,7 +229,7 @@ const evalSuffixExpr = (srcStack, formulaMap, cellRender, cellList) => {
       for (let j = 0; j < len; j += 1) {
         params.push(stack.pop());
       }
-      stack.push(formulaMap[formula].render(params.reverse()));
+      stack.push(formulaMap[formula].render.call(spreadsheet, params.reverse()));
     } else {
       if (cellList.includes(expr)) {
         return 0;
@@ -245,14 +245,15 @@ const evalSuffixExpr = (srcStack, formulaMap, cellRender, cellList) => {
   return stack[0];
 };
 
-const cellRender = (src, formulaMap, getCellText, cellList = []) => {
+const cellRender = (spreadsheet, src, formulaMap, getCellText, cellList = []) => {
   if (src[0] === '=') {
     const stack = infixExprToSuffixExpr(src.substring(1));
     if (stack.length <= 0) return src;
     return evalSuffixExpr(
+      spreadsheet,
       stack,
       formulaMap,
-      (x, y) => cellRender(getCellText(x, y), formulaMap, getCellText, cellList),
+      (x, y) => cellRender(spreadsheet, getCellText(x, y), formulaMap, getCellText, cellList),
       cellList,
     );
   }
