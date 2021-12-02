@@ -204,6 +204,10 @@ declare module 'x-data-spreadsheet' {
      */
     change(callback: (json: Record<string, any>) => void): this;
     /**
+     * reRender
+     */
+    reRender(): this;
+    /**
      * set locale
      * @param lang
      * @param message
