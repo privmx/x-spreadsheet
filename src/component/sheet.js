@@ -697,7 +697,7 @@ function sheetInitEvents() {
   });
 
   bind(window, 'click', (evt) => {
-    this.focusing = overlayerEl.contains(evt.target);
+    this.focusing = this.spreadsheetEl.contains(evt.target);
   });
 
   bind(window, 'paste', (evt) => {
@@ -866,6 +866,7 @@ function sheetInitEvents() {
 
 export default class Sheet {
   constructor(targetEl, data, spreadsheet) {
+    this.spreadsheetEl = targetEl;
     this.spreadsheet = spreadsheet;
     this.eventMap = createEventEmitter();
     const { view, showToolbar, showContextmenu } = data.settings;
