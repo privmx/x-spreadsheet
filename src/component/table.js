@@ -14,16 +14,6 @@ const tableGridStyle = {
   lineWidth: thinLineWidth,
   strokeStyle: '#e6e6e6',
 };
-function tableFixedHeaderStyle() {
-  return {
-    textAlign: 'center',
-    textBaseline: 'middle',
-    font: `500 ${npx(12)}px Source Sans Pro`,
-    fillStyle: '#585757',
-    lineWidth: thinLineWidth(),
-    strokeStyle: '#e6e6e6',
-  };
-}
 
 function getDrawBox(data, rindex, cindex, yoffset = 0) {
   const {
@@ -202,7 +192,14 @@ function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
   // console.log(data.selectIndexes);
   // draw text
   // text font, align...
-  draw.attr(tableFixedHeaderStyle());
+  draw.attr({
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: `500 ${npx(12)}px ${this.spreadsheet.data.settings.cellHeaderStyle.fontFamily}`,
+    fillStyle: '#585757',
+    lineWidth: thinLineWidth(),
+    strokeStyle: '#e6e6e6',
+  });
   // y-header-text
   if (type === 'all' || type === 'left') {
     data.rowEach(viewRange.sri, viewRange.eri, (i, y1, rowHeight) => {

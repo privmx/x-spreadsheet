@@ -108,6 +108,7 @@ const defaultSettings = {
     bgcolor: '#f4f5f8',
     selectedBgcolor: 'rgba(75, 137, 255, 0.08)',
     cornerBgcolor: '#f4f5f8',
+    fontFamily: 'Source Sans Pro',
   },
 };
 

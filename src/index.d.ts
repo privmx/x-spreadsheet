@@ -49,6 +49,7 @@ declare module 'x-data-spreadsheet' {
       bgcolor: string;
       selectedBgcolor: string;
       cornerBgcolor: string;
+      fontFamily: string;
     };
   }
 
