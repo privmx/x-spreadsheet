@@ -45,6 +45,11 @@ declare module 'x-data-spreadsheet' {
         italic: false;
       };
     };
+    cellHeaderStyle?: {
+      bgcolor: string;
+      selectedBgcolor: string;
+      cornerBgcolor: string;
+    };
   }
 
   export type CELL_SELECTED = 'cell-selected';

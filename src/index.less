@@ -42,6 +42,11 @@
 @form-field-height: 30px;
 @primary-color: @blue-color;
 @primary-hover-color: @blue-hover-color;
+@activeSolidColor: var(--x-spreadsheet-active-solid-color, rgb(75, 137, 255));
+@activeOverlayColor: var(--x-spreadsheet-active-overlay-color, rgba(75, 137, 255, .1));
+@activeHoverColor: var(--x-spreadsheet-active-hover-color, rgba(75, 137, 255, .25));
+@activeFocusColor: var(--x-spreadsheet-active-focus-color, rgba(75, 137, 255, .2));
+
 
 // method
 .type-primary() {
@@ -252,7 +257,7 @@ body {
   z-index: 11;
 
   .@{css-prefix}-resizer-hover {
-    background-color: rgba(75, 137, 255, .25);
+    background-color: @activeHoverColor;
   }
   .@{css-prefix}-resizer-line {
     position: absolute;
@@ -261,7 +266,7 @@ body {
   &.horizontal {
     cursor: row-resize;
     .@{css-prefix}-resizer-line {
-      border-bottom: 2px dashed rgb(75, 137, 255);
+      border-bottom: 2px dashed @activeSolidColor;
       left: 0;
       bottom: 0;
     }
@@ -269,7 +274,7 @@ body {
   &.vertical {
     cursor: col-resize;
     .@{css-prefix}-resizer-line {
-      border-right: 2px dashed rgb(75, 137, 255);
+      border-right: 2px dashed @activeSolidColor;
       top: 0;
       right: 0;
     }
@@ -345,8 +350,8 @@ body {
   }
   .@{css-prefix}-selector-area {
     position: absolute;
-    border: 2px solid rgb(75, 137, 255);
-    background: rgba(75, 137, 255, .1);
+    border: 2px solid @activeSolidColor;
+    background: @activeOverlayColor;
     z-index: 5;
   }
   .@{css-prefix}-selector-clipboard, .@{css-prefix}-selector-autofill {
@@ -355,7 +360,7 @@ body {
     z-index: 100;
   }
   .@{css-prefix}-selector-clipboard {
-    border: 2px dashed rgb(75, 137, 255);
+    border: 2px dashed @activeSolidColor;
   }
   .@{css-prefix}-selector-autofill {
     border: 1px dashed rgba(0, 0, 0, .45); // #606060; // rgba(0, 0, 0, .2);
@@ -370,7 +375,7 @@ body {
     right: -5px;
     bottom: -5px;
     border: 2px solid rgb(255, 255, 255);
-    background: rgb(75, 137, 255);
+    background: @activeSolidColor;
   }
 }
 .@{css-prefix}-editor {
@@ -378,7 +383,7 @@ body {
   .@{css-prefix}-editor-area {
     position: absolute;
     text-align: left;
-    border: 2px solid rgb(75, 137, 255);
+    border: 2px solid @activeSolidColor;
     line-height: 0;
     z-index: 100;
     pointer-events: auto;
@@ -881,8 +886,8 @@ body {
     box-shadow: inset 0 1px 2px hsla(0,0%,4%,.06);
 
     &:focus {
-      border-color: rgb(75, 137, 255);
-      box-shadow: inset 0 1px 2px rgba(75, 137, 255, .2);
+      border-color: @activeSolidColor;
+      box-shadow: inset 0 1px 2px @activeFocusColor;
     }
   }
 }

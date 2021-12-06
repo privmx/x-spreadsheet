@@ -9,7 +9,6 @@ import {
 } from '../canvas/draw';
 // gobal var
 const cellPaddingWidth = 5;
-const tableFixedHeaderCleanStyle = { fillStyle: '#f4f5f8' };
 const tableGridStyle = {
   fillStyle: '#fff',
   lineWidth: thinLineWidth,
@@ -173,7 +172,7 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty) {
 function renderSelectedHeaderCell(x, y, w, h) {
   const { draw } = this;
   draw.save();
-  draw.attr({ fillStyle: 'rgba(75, 137, 255, 0.08)' })
+  draw.attr({ fillStyle: this.spreadsheet.data.settings.cellHeaderStyle.selectedBgcolor })
     .fillRect(x, y, w, h);
   draw.restore();
 }
@@ -193,7 +192,7 @@ function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
 
   draw.save();
   // draw rect background
-  draw.attr(tableFixedHeaderCleanStyle);
+  draw.attr({ fillStyle: this.spreadsheet.data.settings.cellHeaderStyle.bgcolor });
   if (type === 'all' || type === 'left') draw.fillRect(0, nty, w, sumHeight);
   if (type === 'all' || type === 'top') draw.fillRect(ntx, 0, sumWidth, h);
 
@@ -251,7 +250,7 @@ function renderFixedLeftTopCell(fw, fh) {
   const { draw } = this;
   draw.save();
   // left-top-cell
-  draw.attr({ fillStyle: '#f4f5f8' })
+  draw.attr({ fillStyle: this.spreadsheet.data.settings.cellHeaderStyle.cornerBgcolor })
     .fillRect(0, 0, fw, fh);
   draw.restore();
 }
