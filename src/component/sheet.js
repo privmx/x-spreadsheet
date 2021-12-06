@@ -14,6 +14,7 @@ import Print from './print';
 import ContextMenu from './contextmenu';
 import Table from './table';
 import Toolbar from './toolbar/index';
+import FormulaBar from './formulabar';
 import ModalValidation from './modal_validation';
 import SortFilter from './sort_filter';
 import { xtoast } from './message';
@@ -81,6 +82,8 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
     // trigger click event
     selector.set(ri, ci, indexesUpdated);
     this.trigger('cell-selected', cell, ri, ci);
+    const text = cell ? cell.text : '';
+    this.formulaBar.reset(text);
   }
   contextMenu.setMode((ri === -1 || ci === -1) ? 'row-col' : 'range');
   toolbar.reset();
@@ -316,7 +319,10 @@ function clearClipboard() {
 
 function copy(evt) {
   const { data, selector } = this;
-  if (data.settings.mode === 'read') return;
+  if (data.settings.mode === 'read') {
+    data.copyToSystemClipboard(evt);
+    return;
+  }
   data.copy();
   data.copyToSystemClipboard(evt);
   selector.showClipboard();
@@ -660,6 +666,12 @@ function sheetInitEvents() {
   };
   // editor
   editor.change = (state, itext) => {
+    if (state === 'finished') {
+      this.formulaBar.reset(itext);
+    }
+    else {
+      this.formulaBar.setText(itext);
+    }
     dataSetCellText.call(this, itext, state);
   };
   // modal validation
@@ -708,6 +720,9 @@ function sheetInitEvents() {
 
   bind(window, 'copy', (evt) => {
     if (!this.focusing) return;
+    if (document.activeElement === this.formulaBar.inputEl.el) {
+      return;
+    }
     copy.call(this, evt);
     evt.preventDefault();
   });
@@ -872,8 +887,14 @@ export default class Sheet {
     const { view, showToolbar, showContextmenu } = data.settings;
     this.el = h('div', `${cssPrefix}-sheet`);
     this.toolbar = new Toolbar(data, view.width, !showToolbar);
+    this.formulaBar = new FormulaBar(data.settings.mode !== 'read', value => {
+      dataSetCellText.call(this, value, 'finished');
+      if (this.editor.cell) {
+        this.editor.setText(value);
+      }
+    });
     this.print = new Print(data, spreadsheet);
-    targetEl.children(this.toolbar.el, this.el, this.print.el);
+    targetEl.children(this.toolbar.el, this.formulaBar.el, this.el, this.print.el);
     this.data = data;
     // table
     this.tableEl = h('canvas', `${cssPrefix}-table`);

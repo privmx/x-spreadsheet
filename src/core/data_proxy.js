@@ -108,6 +108,7 @@ const defaultSettings = {
 
 const toolbarHeight = 41;
 const bottombarHeight = 41;
+const formulaBarHeight = 30;
 
 // src: cellRange
 // dst: cellRange
@@ -1035,6 +1036,7 @@ export default class DataProxy {
     if (showToolbar) {
       h -= toolbarHeight;
     }
+    h -= formulaBarHeight;
     return h;
   }
 
