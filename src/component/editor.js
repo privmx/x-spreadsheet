@@ -46,7 +46,14 @@ function insertText({ target }, itxt) {
 }
 
 function keydownEventHandler(evt) {
-  const { keyCode, altKey } = evt;
+  const { keyCode, altKey, shiftKey } = evt;
+  if (keyCode === 38 || keyCode === 40) {
+    this.clear();
+    if (this.moveCursorFn) {
+      this.moveCursorFn(keyCode === 38 ? -1 : 1, shiftKey);
+    }
+    return;
+  }
   if (keyCode !== 13 && keyCode !== 9) evt.stopPropagation();
   if (keyCode === 13 && altKey) {
     insertText.call(this, evt, '\n');
@@ -164,10 +171,11 @@ function dateFormat(d) {
 }
 
 export default class Editor {
-  constructor(formulas, viewFn, rowHeight) {
+  constructor(formulas, viewFn, rowHeight, moveCursorFn) {
     this.viewFn = viewFn;
     this.rowHeight = rowHeight;
     this.formulas = formulas;
+    this.moveCursorFn = moveCursorFn;
     this.suggest = new Suggest(formulas, (it) => {
       suggestItemClick.call(this, it);
     });

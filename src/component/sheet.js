@@ -909,6 +909,14 @@ export default class Sheet {
       formulas,
       () => this.getTableOffset(),
       data.rows.height,
+      (direction, shiftKey) => {
+        if (direction < 0) {
+          selectorMove.call(this, shiftKey, 'up');
+        }
+        else if (direction > 0) {
+          selectorMove.call(this, shiftKey, 'down');
+        }
+      },
     );
     // data validation
     this.modalValidation = new ModalValidation();
