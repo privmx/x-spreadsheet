@@ -255,6 +255,16 @@ declare module 'x-data-spreadsheet' {
      */
     reRender(): this;
     /**
+     * get selected range
+     * @param sheetIndex
+     */
+    getSelectedRange(sheetIndex?: number): { col0: number, col1: number, row0: number, row1: number };
+    /**
+     * set selected range
+     * @param sheetIndex
+     */
+    setSelectedRange(range: { col0: number, col1: number, row0: number, row1: number }, sheetIndex?: number): void;
+    /**
      * set locale
      * @param lang
      * @param message

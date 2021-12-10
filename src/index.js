@@ -103,6 +103,21 @@ class Spreadsheet {
   cellStyle(ri, ci, sheetIndex = 0) {
     return this.datas[sheetIndex].getCellStyle(ri, ci);
   }
+  
+  getSelectedRange(sheetIndex = 0) {
+    const range = this.datas[sheetIndex].selector.range;
+    return {
+      col0: range.sci,
+      col1: range.eci,
+      row0: range.sri,
+      row1: range.eri,
+    };
+  }
+  
+  setSelectedRange(range) {
+    this.sheet.selectorSet(false, range.row0, range.col0, true, false);
+    this.sheet.selectorSet(true, range.row1, range.col1, true, false);
+  }
 
   reRender() {
     this.sheet.table.render();
