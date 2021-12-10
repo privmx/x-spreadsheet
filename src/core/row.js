@@ -138,27 +138,41 @@ class Rows {
                 const nci = jj + (j - sci);
                 const ncell = helper.cloneDeep(this._[i].cells[j]);
                 // ncell.text
-                if (autofill && ncell && ncell.text && ncell.text.length > 0) {
+                if (ncell && ncell.text && ncell.text.length > 0) {
                   const { text } = ncell;
                   let n = (jj - dsci) + (ii - dsri) + 2;
                   if (!isAdd) {
                     n -= dn + 1;
                   }
                   if (text[0] === '=') {
-                    ncell.text = text.replace(/[a-zA-Z]{1,3}\d+/g, (word) => {
+                    ncell.text = text.replace(/\$?[a-zA-Z]{1,3}\$?\d+/g, (word) => {
                       let [xn, yn] = [0, 0];
-                      if (sri === dsri) {
-                        xn = n - 1;
-                        // if (isAdd) xn -= 1;
-                      } else {
-                        yn = n - 1;
+                      if (autofill) {
+                        if (sri === dsri) {
+                          xn = n - 1;
+                          // if (isAdd) xn -= 1;
+                        } else {
+                          yn = n - 1;
+                        }
+                      }
+                      else {
+                        xn = nci - j;
+                        yn = nri - i;
+                      }
+                      const isConstX = /\$[a-zA-Z]{1,3}\$?\d+/.test(word);
+                      const isConstY = /\$?[a-zA-Z]{1,3}\$\d+/.test(word);
+                      if (isConstX) {
+                        xn = 0;
+                      }
+                      if (isConstY) {
+                        yn = 0;
                       }
                       if (/^\d+$/.test(word)) return word;
-                      return expr2expr(word, xn, yn);
+                      return expr2expr(word, xn, yn, () => true, isConstX, isConstY);
                     });
-                  } else if ((rn <= 1 && cn > 1 && (dsri > eri || deri < sri))
+                  } else if (autofill && ((rn <= 1 && cn > 1 && (dsri > eri || deri < sri))
                     || (cn <= 1 && rn > 1 && (dsci > eci || deci < sci))
-                    || (rn <= 1 && cn <= 1)) {
+                    || (rn <= 1 && cn <= 1))) {
                     const result = /[\\.\d]+$/.exec(text);
                     // console.log('result:', result);
                     if (result !== null) {

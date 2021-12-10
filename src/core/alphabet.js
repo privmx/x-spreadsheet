@@ -50,6 +50,7 @@ export function indexAt(str) {
 export function expr2xy(src) {
   let x = '';
   let y = '';
+  src = src.replace(/\$/g, '');
   for (let i = 0; i < src.length; i += 1) {
     if (src.charAt(i) >= '0' && src.charAt(i) <= '9') {
       y += src.charAt(i);
@@ -66,10 +67,12 @@ export function expr2xy(src) {
  * @export
  * @param {number} x
  * @param {number} y
+ * @param {boolean} isConstX
+ * @param {boolean} isConstY
  * @returns {tagA1}
  */
-export function xy2expr(x, y) {
-  return `${stringAt(x)}${y + 1}`;
+export function xy2expr(x, y, isConstX, isConstY) {
+  return `${isConstX ? '$' : ''}${stringAt(x)}${isConstY ? '$' : ''}${y + 1}`;
 }
 
 /** translate A1-tag src by (xn, yn)
@@ -78,13 +81,16 @@ export function xy2expr(x, y) {
  * @param {tagA1} src
  * @param {number} xn
  * @param {number} yn
+ * @param {function} condition
+ * @param {boolean} isConstX
+ * @param {boolean} isConstY
  * @returns {tagA1}
  */
-export function expr2expr(src, xn, yn, condition = () => true) {
+export function expr2expr(src, xn, yn, condition = () => true, isConstX, isConstY) {
   if (xn === 0 && yn === 0) return src;
   const [x, y] = expr2xy(src);
   if (!condition(x, y)) return src;
-  return xy2expr(x + xn, y + yn);
+  return xy2expr(x + xn, y + yn, isConstX, isConstY);
 }
 
 export default {

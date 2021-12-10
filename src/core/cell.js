@@ -18,7 +18,7 @@ const infixExprToSuffixExpr = (src) => {
     if (c !== ' ') {
       if (c >= 'a' && c <= 'z') {
         subStrs.push(c.toUpperCase());
-      } else if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || c === '.') {
+      } else if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || c === '.' || c == '$') {
         subStrs.push(c);
       } else if (c === '"') {
         i += 1;
