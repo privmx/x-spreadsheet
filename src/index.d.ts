@@ -51,6 +51,45 @@ declare module 'x-data-spreadsheet' {
       cornerBgcolor: string;
       fontFamily: string;
     };
+    toolbar?: {
+      misc: {
+        undo: boolean;
+        redo: boolean;
+        print: boolean;
+        paintFormat: boolean;
+        clearFormat: boolean;
+      };
+      format: {
+        format: boolean;
+      };
+      font: {
+        family: boolean;
+        size: boolean;
+      };
+      textStyle: {
+        bold: boolean;
+        italic: boolean;
+        underline: boolean;
+        strike: boolean;
+        color: boolean;
+      };
+      cell: {
+        fill: boolean;
+        borders: boolean;
+        merge: boolean;
+      };
+      cellText: {
+        horizontalAlignment: boolean;
+        verticalAlignment: boolean;
+        wrap: boolean;
+      };
+      tools: {
+        freezeCell: boolean;
+        filter: boolean;
+        formulas: boolean;
+      };
+      itemsCallback: (items: any|any[]) => void;
+    };
   }
 
   export type CELL_SELECTED = 'cell-selected';

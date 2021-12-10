@@ -110,6 +110,45 @@ const defaultSettings = {
     cornerBgcolor: '#f4f5f8',
     fontFamily: 'Source Sans Pro',
   },
+  toolbar: {
+    misc: {
+      undo: true,
+      redo: true,
+      print: true,
+      paintFormat: true,
+      clearFormat: true,
+    },
+    format: {
+      format: true,
+    },
+    font: {
+      family: true,
+      size: true,
+    },
+    textStyle: {
+      bold: true,
+      italic: true,
+      underline: true,
+      strike: true,
+      color: true,
+    },
+    cell: {
+      fill: true,
+      borders: true,
+      merge: true,
+    },
+    cellText: {
+      horizontalAlignment: true,
+      verticalAlignment: true,
+      wrap: true,
+    },
+    tools: {
+      freezeCell: true,
+      filter: true,
+      formulas: true,
+    },
+    itemsCallback: () => {},
+  },
 };
 
 const toolbarHeight = 41;

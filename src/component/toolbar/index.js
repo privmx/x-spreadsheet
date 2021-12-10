@@ -103,6 +103,41 @@ function genBtn(it) {
   return btn;
 }
 
+function removeNullToolbarItems(items) {
+  // Remove items that are null
+  for (const idx in items) {
+    if (Array.isArray(items[idx])) {
+      items[idx] = items[idx].filter(item => item !== null);
+    }
+  }
+  
+  // Remove blocks that have no items
+  const idxsToRemove = [];
+  for (const idx in items) {
+    if (Array.isArray(items[idx]) && items[idx].length === 0) {
+      idxsToRemove.push(idx);
+    }
+  }
+  idxsToRemove.reverse().forEach(idx => {
+    items.splice(idx, 1);
+  });
+  
+  // Remove dividers that don't have blocks of items that surround them
+  idxsToRemove.length = 0;
+  let prevIsBlock = false;
+  let nextIsBlock = false;
+  for (let idx = items.length - 1; idx >= 0; --idx) {
+    const item = items[idx];
+    if (!Array.isArray(item)) {
+      prevIsBlock = Array.isArray(items[idx - 1]);
+      nextIsBlock = Array.isArray(items[idx + 1]);
+      if (!prevIsBlock || !nextIsBlock) {
+        items.splice(idx, 1);
+      }
+    }
+  }
+}
+
 export default class Toolbar {
   constructor(data, widthFn, isHide = false) {
     this.data = data;
@@ -110,50 +145,55 @@ export default class Toolbar {
     this.widthFn = widthFn;
     this.isHide = isHide;
     const style = data.defaultStyle();
+    const ts = data.settings.toolbar;
     this.items = [
       [
-        this.undoEl = new Undo(),
-        this.redoEl = new Redo(),
-        new Print(),
-        this.paintformatEl = new Paintformat(),
-        this.clearformatEl = new Clearformat(),
+        this.createItem(() => this.undoEl = new Undo(), ts.misc.undo),
+        this.createItem(() => this.redoEl = new Redo(), ts.misc.redo),
+        this.createItem(() => new Print(), ts.misc.print),
+        this.createItem(() => this.paintformatEl = new Paintformat(), ts.misc.paintFormat),
+        this.createItem(() => this.clearformatEl = new Clearformat(), ts.misc.clearFormat),
       ],
       buildDivider(),
       [
-        this.formatEl = new Format(),
+        this.createItem(() => this.formatEl = new Format(), ts.format.format),
       ],
       buildDivider(),
       [
-        this.fontEl = new Font(),
-        this.fontSizeEl = new FontSize(),
+        this.createItem(() => this.fontEl = new Font(), ts.font.family),
+        this.createItem(() => this.fontSizeEl = new FontSize(), ts.font.size),
       ],
       buildDivider(),
       [
-        this.boldEl = new Bold(),
-        this.italicEl = new Italic(),
-        this.underlineEl = new Underline(),
-        this.strikeEl = new Strike(),
-        this.textColorEl = new TextColor(style.color),
+        this.createItem(() => this.boldEl = new Bold(), ts.textStyle.bold),
+        this.createItem(() => this.italicEl = new Italic(), ts.textStyle.italic),
+        this.createItem(() => this.underlineEl = new Underline(), ts.textStyle.underline),
+        this.createItem(() => this.strikeEl = new Strike(), ts.textStyle.strike),
+        this.createItem(() => this.textColorEl = new TextColor(style.color), ts.textStyle.color),
       ],
       buildDivider(),
       [
-        this.fillColorEl = new FillColor(style.bgcolor),
-        this.borderEl = new Border(),
-        this.mergeEl = new Merge(),
+        this.createItem(() => this.fillColorEl = new FillColor(style.bgcolor), ts.cell.fill),
+        this.createItem(() => this.borderEl = new Border(), ts.cell.borders),
+        this.createItem(() => this.mergeEl = new Merge(), ts.cell.merge),
       ],
       buildDivider(),
       [
-        this.alignEl = new Align(style.align),
-        this.valignEl = new Valign(style.valign),
-        this.textwrapEl = new Textwrap(),
+        this.createItem(() => this.alignEl = new Align(style.align), ts.cellText.horizontalAlignment),
+        this.createItem(() => this.valignEl = new Valign(style.valign), ts.cellText.verticalAlignment),
+        this.createItem(() => this.textwrapEl = new Textwrap(), ts.cellText.wrap),
       ],
       buildDivider(),
       [
-        this.freezeEl = new Freeze(),
-        this.autofilterEl = new Autofilter(),
-        this.formulaEl = new Formula(),
+        this.createItem(() => this.freezeEl = new Freeze(), ts.tools.freezeCell),
+        this.createItem(() => this.autofilterEl = new Autofilter(), ts.tools.filter),
+        this.createItem(() => this.formulaEl = new Formula(), ts.tools.formulas),
       ],
     ];
+    removeNullToolbarItems(this.items);
+    if (ts.itemsCallback) {
+      ts.itemsCallback(this.items);
+    }
 
     const { extendToolbar = {} } = data.settings;
 
@@ -200,6 +240,11 @@ export default class Toolbar {
         moreResize.call(this);
       });
     }
+  }
+  
+  createItem(creatorFunc, returnCondition) {
+    const el = creatorFunc();
+    return returnCondition ? el : null;
   }
 
   paintformatActive() {
