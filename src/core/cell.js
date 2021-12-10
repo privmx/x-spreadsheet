@@ -177,7 +177,7 @@ const evalSubExpr = (subExpr, cellRender) => {
   const [x, y] = expr2xy(expr);
   const cellValue = cellRender(x, y);
   if (ret === 1 && typeof(cellValue) === "string"){ 
-    return cellValue;
+    return cellValue === "" ? 0 : cellValue;
   }
   return ret * cellValue;
 };
