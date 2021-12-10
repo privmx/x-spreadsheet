@@ -30,6 +30,7 @@ export function stringAt(index) {
  */
 export function indexAt(str) {
   let ret = 0;
+  str = str.toUpperCase();
   for (let i = 0; i < str.length - 1; i += 1) {
     const cindex = str.charCodeAt(i) - 65;
     const exponet = str.length - 1 - i;
