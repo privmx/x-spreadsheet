@@ -175,7 +175,11 @@ const evalSubExpr = (subExpr, cellRender) => {
     return ret * Number(expr);
   }
   const [x, y] = expr2xy(expr);
-  return ret * cellRender(x, y);
+  const cellValue = cellRender(x, y);
+  if (ret === 1 && typeof(cellValue) === "string"){ 
+    return cellValue;
+  }
+  return ret * cellValue;
 };
 
 // evaluate the suffix expression
