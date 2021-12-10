@@ -85,7 +85,7 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
     const text = cell ? cell.text : '';
     this.formulaBar.reset(text);
   }
-  contextMenu.setMode((ri === -1 || ci === -1) ? 'row-col' : 'range');
+  contextMenu.setMode((ri === -1 || ci === -1) ? (ri === -1 ? 'col' : 'row') : 'range');
   toolbar.reset();
   table.render();
 }
@@ -884,7 +884,7 @@ export default class Sheet {
     this.spreadsheetEl = targetEl;
     this.spreadsheet = spreadsheet;
     this.eventMap = createEventEmitter();
-    const { view, showToolbar, showContextmenu } = data.settings;
+    const { view, showToolbar, showContextmenu, showContextMenuForCells } = data.settings;
     this.el = h('div', `${cssPrefix}-sheet`);
     this.toolbar = new Toolbar(data, view.width, !showToolbar);
     this.formulaBar = new FormulaBar(data.settings.mode !== 'read', value => {
@@ -917,11 +917,12 @@ export default class Sheet {
           selectorMove.call(this, shiftKey, 'down');
         }
       },
+      data.settings.suggestFormulas,
     );
     // data validation
     this.modalValidation = new ModalValidation();
     // contextMenu
-    this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu);
+    this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu, !showContextMenuForCells);
     // selector
     this.selector = new Selector(data);
     this.overlayerCEl = h('div', `${cssPrefix}-overlayer-content`)
@@ -951,6 +952,7 @@ export default class Sheet {
     sheetReset.call(this);
     // init selector [0, 0]
     selectorSet.call(this, false, 0, 0);
+    this.selectorSet = selectorSet;
   }
 
   on(eventName, func) {

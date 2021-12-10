@@ -171,14 +171,14 @@ function dateFormat(d) {
 }
 
 export default class Editor {
-  constructor(formulas, viewFn, rowHeight, moveCursorFn) {
+  constructor(formulas, viewFn, rowHeight, moveCursorFn, suggestFormulas) {
     this.viewFn = viewFn;
     this.rowHeight = rowHeight;
     this.formulas = formulas;
     this.moveCursorFn = moveCursorFn;
     this.suggest = new Suggest(formulas, (it) => {
       suggestItemClick.call(this, it);
-    });
+    }, '200px', !suggestFormulas);
     this.datepicker = new Datepicker();
     this.datepicker.change((d) => {
       // console.log('d:', d);

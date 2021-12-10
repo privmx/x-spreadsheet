@@ -77,7 +77,9 @@ const defaultSettings = {
   showGrid: true,
   showToolbar: true,
   showContextmenu: true,
+  showContextMenuForCells: true,
   showBottomBar: true,
+  suggestFormulas: true,
   row: {
     len: 100,
     height: 25,

@@ -10,7 +10,9 @@ declare module 'x-data-spreadsheet' {
     showToolbar?: boolean;
     showGrid?: boolean;
     showContextmenu?: boolean;
+    showContextMenuForCells?: boolean;
     showBottomBar?: boolean;
+    suggestFormulas?: boolean;
     extendToolbar?: {
       left?: ExtendToolbarOption[],
       right?: ExtendToolbarOption[],

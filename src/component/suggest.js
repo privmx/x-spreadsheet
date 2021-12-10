@@ -68,12 +68,13 @@ function inputKeydownHandler(evt) {
 }
 
 export default class Suggest {
-  constructor(items, itemClick, width = '200px') {
+  constructor(items, itemClick, width = '200px', disabled = false) {
     this.filterItems = [];
     this.items = items;
     this.el = h('div', `${cssPrefix}-suggest`).css('width', width).hide();
     this.itemClick = itemClick;
     this.itemIndex = -1;
+    this.disabled = disabled;
   }
 
   setOffset(v) {
@@ -82,6 +83,9 @@ export default class Suggest {
   }
 
   hide() {
+    if (this.disabled) {
+      return;
+    }
     const { el } = this;
     this.filterItems = [];
     this.itemIndex = -1;
@@ -95,6 +99,9 @@ export default class Suggest {
   }
 
   search(word) {
+    if (this.disabled) {
+      return;
+    }
     let { items } = this;
     if (!/^\s*$/.test(word)) {
       items = items.filter(it => (it.key || it).startsWith(word.toUpperCase()));

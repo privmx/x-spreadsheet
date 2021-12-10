@@ -28,18 +28,23 @@ const menuItems = [
 ];
 
 function buildMenuItem(item) {
+  let el = null;
   if (item.key === 'divider') {
-    return h('div', `${cssPrefix}-item divider`);
+    el = h('div', `${cssPrefix}-item divider`);
   }
-  return h('div', `${cssPrefix}-item`)
-    .on('click', () => {
-      this.itemClick(item.key);
-      this.hide();
-    })
-    .children(
-      item.title(),
-      h('div', 'label').child(item.label || ''),
-    );
+  else {
+    el = h('div', `${cssPrefix}-item`)
+      .on('click', () => {
+        this.itemClick(item.key);
+        this.hide();
+      })
+      .children(
+        item.title(),
+        h('div', 'label').child(item.label || ''),
+      );
+  }
+  el.key = item.key;
+  return el;
 }
 
 function buildMenu() {
@@ -47,7 +52,7 @@ function buildMenu() {
 }
 
 export default class ContextMenu {
-  constructor(viewFn, isHide = false) {
+  constructor(viewFn, isHide = false, isHideForRange = false) {
     this.menuItems = buildMenu.call(this);
     this.el = h('div', `${cssPrefix}-contextmenu`)
       .children(...this.menuItems)
@@ -55,17 +60,71 @@ export default class ContextMenu {
     this.viewFn = viewFn;
     this.itemClick = () => {};
     this.isHide = isHide;
+    this.isHideForRange = isHideForRange;
     this.setMode('range');
+    this.mode = 'range';
   }
 
-  // row-col: the whole rows or the whole cols
+  // row: the whole rows
+  // col: the whole cols
   // range: select range
   setMode(mode) {
-    const hideEl = this.menuItems[12];
-    if (mode === 'row-col') {
+    const hideEl = this.getItemByKey('hide');
+    this.mode = mode;
+    if (mode === 'row' || mode === 'col') {
       hideEl.show();
     } else {
+      if (this.isHideForRange) {
+        this.hide();
+      }
       hideEl.hide();
+    }
+    this.toggleShowRowElements(mode !== 'col');
+    this.toggleShowColumnElements(mode !== 'row');
+  }
+  
+  getItemByKey(key) {
+    for (const item of this.menuItems) {
+      if (item.key === key) {
+        return item;
+      }
+    }
+    return null;
+  }
+  
+  toggleShowColumnElements(show) {
+    const hide = !show;
+    const columnElements = [
+      this.getItemByKey('delete-column'),
+      this.getItemByKey('insert-column'),
+    ];
+    for (const element of columnElements) {
+      if (element) {
+        if (hide) {
+          element.hide();
+        }
+        else {
+          element.show();
+        }
+      }
+    }
+  }
+  
+  toggleShowRowElements(show) {
+    const hide = !show;
+    const rowElements = [
+      this.getItemByKey('delete-row'),
+      this.getItemByKey('insert-row'),
+    ];
+    for (const element of rowElements) {
+      if (element) {
+        if (hide) {
+          element.hide();
+        }
+        else {
+          element.show();
+        }
+      }
     }
   }
 
@@ -77,6 +136,7 @@ export default class ContextMenu {
 
   setPosition(x, y) {
     if (this.isHide) return;
+    if (this.isHideForRange && this.mode === 'range') return;
     const { el } = this;
     const { width } = el.show().offset();
     const view = this.viewFn();
