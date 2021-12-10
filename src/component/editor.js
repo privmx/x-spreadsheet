@@ -293,4 +293,28 @@ export default class Editor {
     setText.call(this, text, text.length);
     resetTextareaSize.call(this);
   }
+  
+  appendText(text) {
+    this.setText(this.inputText + text);
+  }
+  
+  injectText(text, idxStart, idxEnd = -1) {
+    const left = this.inputText.substr(0, idxStart);
+    const right = this.inputText.substr(idxEnd >= 0 ? idxEnd : idxStart);
+    this.setText(left + text + right);
+  }
+  
+  getCursorPosition() {
+    return [this.textEl.el.selectionStart, this.textEl.el.selectionEnd];
+  }
+  
+  setCursorPosition(idxStart, idxEnd = -1) {
+    this.textEl.el.selectionStart = idxStart;
+    this.textEl.el.selectionEnd = idxEnd >= 0 ? idxEnd : idxStart;
+  }
+  
+  isEnteringFormula() {
+    return this.inputText && this.inputText.startsWith('=');
+  }
+  
 }

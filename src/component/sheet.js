@@ -20,6 +20,7 @@ import SortFilter from './sort_filter';
 import { xtoast } from './message';
 import { cssPrefix } from '../config';
 import { formulas } from '../core/formula';
+import { xy2expr } from '../core/alphabet';
 
 /**
  * @desc throttle fn
@@ -598,7 +599,18 @@ function sheetInitEvents() {
       overlayerMousemove.call(this, evt);
     })
     .on('mousedown', (evt) => {
-      editor.clear();
+      let formulaCellRow;
+      let formulaCellCol;
+      let editorCursorPos;
+      if (editor.isEnteringFormula()) {
+        this.isSelectingCellsForFormula = true;
+        formulaCellRow = this.selector.range.sri;
+        formulaCellCol = this.selector.range.sci;
+        editorCursorPos = this.editor.getCursorPosition();
+      }
+      else {
+        editor.clear();
+      }
       contextMenu.hide();
       // the left mouse button: mousedown → mouseup → click
       // the right mouse button: mousedown → contenxtmenu → mouseup
@@ -614,6 +626,29 @@ function sheetInitEvents() {
         editorSet.call(this);
       } else {
         overlayerMousedown.call(this, evt);
+      }
+      
+      if (this.isSelectingCellsForFormula) {
+        const overlayerMouseup = () => {
+          document.removeEventListener('mouseup', overlayerMouseup);
+          this.isSelectingCellsForFormula = false;
+          const col0 = this.selector.range.sci;
+          const col1 = this.selector.range.eci;
+          const row0 = this.selector.range.sri;
+          const row1 = this.selector.range.eri;
+          const rangeStart = xy2expr(col0, row0);
+          const rangeEnd = xy2expr(col1, row1);
+          const isSingleCell = rangeStart === rangeEnd;
+          const rangeText = isSingleCell ? rangeStart : `${rangeStart}:${rangeEnd}`;
+          this.editor.injectText(rangeText, editorCursorPos[0], editorCursorPos[1]);
+          this.editor.setCursorPosition();
+          this.spreadsheet.setSelectedRange({ row0: formulaCellRow, row1: formulaCellRow, col0: formulaCellCol, col1: formulaCellCol });
+          this.editor.textEl.focus();
+          setTimeout(() => {
+            this.editor.setCursorPosition(editorCursorPos[0] + rangeText.length);
+          }, 0);
+        };
+        document.addEventListener('mouseup', overlayerMouseup);
       }
     })
     .on('mousewheel.stop', (evt) => {
@@ -953,6 +988,7 @@ export default class Sheet {
     // init selector [0, 0]
     selectorSet.call(this, false, 0, 0);
     this.selectorSet = selectorSet;
+    this.isSelectingCellsForFormula = false;
   }
 
   on(eventName, func) {
