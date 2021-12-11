@@ -94,7 +94,7 @@ declare module 'x-data-spreadsheet' {
     };
     clipboard?: {
       setText?: (text: string, event?: ClipboardEvent) => void;
-      getText?: (event?: ClipboardEvent) => string;
+      getText?: (event?: ClipboardEvent) => string | Promise<string>;
     };
   }
 

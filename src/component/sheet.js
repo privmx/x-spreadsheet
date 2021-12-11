@@ -340,7 +340,7 @@ function cut(evt) {
   selector.showClipboard();
 }
 
-function paste(what, evt) {
+async function paste(what, evt) {
   const { data } = this;
   if (data.settings.mode === 'read') return;
   if (data.paste(what, msg => xtoast('Tip', msg))) {
@@ -352,6 +352,9 @@ function paste(what, evt) {
     }
     else {
       cdata = evt.clipboardData.getData('text/plain');
+    }
+    if (cdata instanceof Promise) {
+      cdata = await cdata;
     }
     this.data.pasteFromText(cdata);
     sheetReset.call(this);
