@@ -92,6 +92,10 @@ declare module 'x-data-spreadsheet' {
       };
       itemsCallback: (items: any|any[]) => void;
     };
+    clipboard?: {
+      setText?: (text: string, event?: ClipboardEvent) => void;
+      getText?: (event?: ClipboardEvent) => string;
+    };
   }
 
   export type CELL_SELECTED = 'cell-selected';
@@ -264,6 +268,11 @@ declare module 'x-data-spreadsheet' {
      * @param sheetIndex
      */
     setSelectedRange(range: { col0: number, col1: number, row0: number, row1: number }, sheetIndex?: number): void;
+    /**
+     * clear custom clipboard
+     * @param text
+     */
+    clearCustomClipboard(): void;
     /**
      * set locale
      * @param lang

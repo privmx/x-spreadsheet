@@ -329,10 +329,14 @@ function copy(evt) {
   selector.showClipboard();
 }
 
-function cut() {
+function cut(evt) {
   const { data, selector } = this;
-  if (data.settings.mode === 'read') return;
+  if (data.settings.mode === 'read') {
+    data.copyToSystemClipboard(evt);
+    return;
+  }
   data.cut();
+  data.copyToSystemClipboard(evt);
   selector.showClipboard();
 }
 
@@ -342,7 +346,13 @@ function paste(what, evt) {
   if (data.paste(what, msg => xtoast('Tip', msg))) {
     sheetReset.call(this);
   } else if (evt) {
-    const cdata = evt.clipboardData.getData('text/plain');
+    let cdata;
+    if (data.settings.clipboard && data.settings.clipboard.getText) {
+      cdata = data.settings.clipboard.getText();
+    }
+    else {
+      cdata = evt.clipboardData.getData('text/plain');
+    }
     this.data.pasteFromText(cdata);
     sheetReset.call(this);
   }
@@ -761,6 +771,15 @@ function sheetInitEvents() {
     copy.call(this, evt);
     evt.preventDefault();
   });
+  
+  bind(window, 'cut', (evt) => {
+    if (!this.focusing) return;
+    if (document.activeElement === this.formulaBar.inputEl.el) {
+      return;
+    }
+    cut.call(this, evt);
+    evt.preventDefault();
+  });
 
   // for selector
   bind(window, 'keydown', (evt) => {
@@ -794,8 +813,8 @@ function sheetInitEvents() {
           break;
         case 88:
           // ctrl + x
-          cut.call(this);
-          evt.preventDefault();
+          // cut.call(this);
+          // evt.preventDefault();
           break;
         case 85:
           // ctrl + u

@@ -118,6 +118,10 @@ class Spreadsheet {
     this.sheet.selectorSet(false, range.row0, range.col0, true, false);
     this.sheet.selectorSet(true, range.row1, range.col1, true, false);
   }
+  
+  clearCustomClipboard() {
+    this.sheet.clearClipboard();
+  }
 
   reRender() {
     this.sheet.table.render();

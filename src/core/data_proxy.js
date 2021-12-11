@@ -150,6 +150,7 @@ const defaultSettings = {
       formulas: true,
     },
     itemsCallback: () => {},
+    clipboard: undefined,
   },
 };
 
@@ -478,20 +479,25 @@ export default class DataProxy {
     // Adding \n and why not adding \r\n is to support online office and client MS office and WPS
     copyText = copyText.map(row => row.join('\t')).join('\n');
 
-    // why used this
-    // cuz http protocol will be blocked request clipboard by browser
-    if (evt) {
-      evt.clipboardData.clearData();
-      evt.clipboardData.setData('text/plain', copyText);
-      evt.preventDefault();
+    if (this.settings.clipboard && this.settings.clipboard.setText) {
+      this.settings.clipboard.setText(copyText);
     }
+    else {
+      // why used this
+      // cuz http protocol will be blocked request clipboard by browser
+      if (evt) {
+        evt.clipboardData.clearData();
+        evt.clipboardData.setData('text/plain', copyText);
+        evt.preventDefault();
+      }
 
-    // this need https protocol
-    /* global navigator */
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(copyText).then(() => {}, (err) => {
-        console.log('text copy to the system clipboard error  ', copyText, err);
-      });
+      // this need https protocol
+      /* global navigator */
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(copyText).then(() => {}, (err) => {
+          console.log('text copy to the system clipboard error  ', copyText, err);
+        });
+      }
     }
   }
 
