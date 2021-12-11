@@ -1007,6 +1007,7 @@ export default class Sheet {
     // init selector [0, 0]
     selectorSet.call(this, false, 0, 0);
     this.selectorSet = selectorSet;
+    this.clearClipboard = clearClipboard;
     this.isSelectingCellsForFormula = false;
   }
 
