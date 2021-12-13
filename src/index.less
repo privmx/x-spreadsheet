@@ -326,6 +326,20 @@ body {
   }
 }
 
+.@{css-prefix}-overlayer-clickable-elements-container {
+  .@{css-prefix}-overlayer-clickable-elements-inner {
+    position: relative;
+    > * {
+      position: absolute;
+      overflow: hidden;
+      > * {
+        position: absolute;
+        pointer-events: auto;
+      }
+    }
+  }
+}
+
 .@{css-prefix}-editor, .@{css-prefix}-selector {
   box-sizing: content-box;
   position: absolute;

@@ -340,7 +340,7 @@ function cut(evt) {
   selector.showClipboard();
 }
 
-async function paste(what, evt) {
+function paste(what, evt) {
   const { data } = this;
   if (data.settings.mode === 'read') return;
   if (data.paste(what, msg => xtoast('Tip', msg))) {
@@ -353,11 +353,19 @@ async function paste(what, evt) {
     else {
       cdata = evt.clipboardData.getData('text/plain');
     }
+    const execPaste = () => {
+      this.data.pasteFromText(cdata);
+      sheetReset.call(this);
+    };
     if (cdata instanceof Promise) {
-      cdata = await cdata;
+      cdata.then(cdataNew => {
+        cdata = cdataNew;
+        execPaste();
+      });
     }
-    this.data.pasteFromText(cdata);
-    sheetReset.call(this);
+    else {
+      execPaste();
+    }
   }
 }
 
@@ -392,7 +400,16 @@ function overlayerMousedown(evt) {
   const {
     selector, data, table, sortFilter,
   } = this;
-  const { offsetX, offsetY } = evt;
+  let { offsetX, offsetY } = evt;
+  const trigger = evt.target.closest('.spreadsheet-trigger');
+  if (trigger) {
+    if (evt.ctrlKey) {
+      return;
+    }
+    const rect = this.overlayerEl.el.getBoundingClientRect();
+    offsetX = evt.clientX - rect.x;
+    offsetY = evt.clientY - rect.y;
+  }
   const isAutofillEl = evt.target.className === `${cssPrefix}-selector-corner`;
   const cellRect = data.getCellRectByXY(offsetX, offsetY);
   const {
@@ -458,6 +475,10 @@ function editorSetOffset() {
     sPosition = 'bottom';
   }
   editor.setOffset(sOffset, sPosition);
+  this.clickableElementsInner.offset({
+    left: -this.data.scroll.x,
+    top: -this.data.scroll.y,
+  });
 }
 
 function editorSet(initialText) {
@@ -982,10 +1003,14 @@ export default class Sheet {
     this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu, !showContextMenuForCells);
     // selector
     this.selector = new Selector(data);
+    this.clickableElementsInner = h('div', `${cssPrefix}-overlayer-clickable-elements-inner`);
+    this.clickableElementsContainer = h('div', `${cssPrefix}-overlayer-clickable-elements-container`)
+      .child(this.clickableElementsInner);
     this.overlayerCEl = h('div', `${cssPrefix}-overlayer-content`)
       .children(
         this.editor.el,
         this.selector.el,
+        this.clickableElementsContainer,
       );
     this.overlayerEl = h('div', `${cssPrefix}-overlayer`)
       .child(this.overlayerCEl);
@@ -1004,7 +1029,7 @@ export default class Sheet {
       this.sortFilter.el,
     );
     // table
-    this.table = new Table(this.tableEl.el, data, this.spreadsheet);
+    this.table = new Table(this.tableEl.el, data, this.spreadsheet, this.clickableElementsInner);
     sheetInitEvents.call(this);
     sheetReset.call(this);
     // init selector [0, 0]

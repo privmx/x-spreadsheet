@@ -8,6 +8,11 @@ import { locale } from './locale/locale';
 import { addCustomFormula } from './core/formula';
 import './index.less';
 
+const clickableElementFinders = [];
+function addClickableElementFinder(finder, render, onCtrlClick) {
+  clickableElementFinders.push({ finder, render, onCtrlClick });
+}
+
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -142,6 +147,10 @@ class Spreadsheet {
     this.sheet.on('change', cb);
     return this;
   }
+  
+  getClickableElementFinders() {
+    return clickableElementFinders;
+  }
 
   static locale(lang, message) {
     locale(lang, message);
@@ -149,6 +158,10 @@ class Spreadsheet {
   
   static addCustomFormula(key, title, render) {
     addCustomFormula(key, title, render);
+  }
+  
+  static addClickableElementFinder(finder, render, onCtrlClick) {
+    addClickableElementFinder(finder, render, onCtrlClick);
   }
 }
 
@@ -158,6 +171,7 @@ if (window) {
   window.x_spreadsheet = spreadsheet;
   window.x_spreadsheet.locale = (lang, message) => locale(lang, message);
   window.x_spreadsheet.addCustomFormula = (key, title, render) => addCustomFormula(key, title, render);
+  window.x_spreadsheet.addClickableElementFinder = (finder, render, onCtrlClick) => addClickableElementFinder(finder, render, onCtrlClick);
 }
 
 export default Spreadsheet;

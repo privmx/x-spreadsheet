@@ -296,11 +296,12 @@ function renderFreezeHighlightLine(fw, fh, ftw, fth) {
 
 /** end */
 class Table {
-  constructor(el, data, spreadsheet) {
+  constructor(el, data, spreadsheet, clickableElementsInner) {
     this.el = el;
-    this.draw = new Draw(el, data.viewWidth(), data.viewHeight());
+    this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), spreadsheet.getClickableElementFinders(), clickableElementsInner);
     this.data = data;
     this.spreadsheet = spreadsheet;
+    this.clickableElementsInner = clickableElementsInner;
   }
 
   resetData(data) {
@@ -309,6 +310,7 @@ class Table {
   }
 
   render() {
+    this.clickableElementsInner.el.innerHTML = '';
     // resize canvas
     const { data } = this;
     const { rows, cols } = data;

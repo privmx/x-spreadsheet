@@ -26,6 +26,26 @@
         }
         return Math.sqrt(x);
       });
+      function finder(text) {
+        const res = [];
+        for (const match of text.matchAll(/https?:\/\/[^\s\)]+/g)) {
+          res.push({
+            start: match.index,
+            length: match[0].length,
+            extraPreSpaces: 2,
+            extraPostSpaces: 5,
+            data: match[0],
+          });
+        }
+        return res;
+      }
+      function render(text, data) {
+        return '<span style="background:#ff0000;" data-link="' + data + '">' + text + '</span>';
+      }
+      function onCtrlClick(data) {
+        console.log('custom click: "' + data + '"');
+      }
+      x_spreadsheet.addClickableElementFinder(finder, render, onCtrlClick);
       const rows10 = { len: 1000 };
       for (let i = 0; i < 1000; i += 1) {
         rows10[i] = {

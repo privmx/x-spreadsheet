@@ -131,11 +131,13 @@ function drawFontLine(type, tx, ty, align, valign, blheight, blwidth) {
 }
 
 class Draw {
-  constructor(el, width, height) {
+  constructor(el, width, height, clickableElementFinders, clickableElementsContainer) {
     this.el = el;
     this.ctx = el.getContext('2d');
     this.resize(width, height);
     this.ctx.scale(dpr(), dpr());
+    this.clickableElementFinders = clickableElementFinders;
+    this.clickableElementsContainer = clickableElementsContainer
   }
 
   resize(width, height) {
@@ -233,41 +235,200 @@ class Draw {
     const txts = `${mtxt}`.split('\n');
     const biw = box.innerWidth();
     const ntxts = [];
-    txts.forEach((it) => {
+    txts.forEach((_it) => {
+      const [clickable, it, texts] = this.parseClickableElements(_it);
       const txtWidth = ctx.measureText(it).width;
       if (textWrap && txtWidth > npx(biw)) {
         let textLine = { w: 0, len: 0, start: 0 };
         for (let i = 0; i < it.length; i += 1) {
           if (textLine.w >= npx(biw)) {
-            ntxts.push(it.substr(textLine.start, textLine.len));
+            const segments = this.getTextSegments(texts, textLine.start, textLine.len);
+            ntxts.push(segments);
             textLine = { w: 0, len: 0, start: i };
           }
           textLine.len += 1;
           textLine.w += ctx.measureText(it[i]).width + 1;
         }
         if (textLine.len > 0) {
-          ntxts.push(it.substr(textLine.start, textLine.len));
+          const segments = this.getTextSegments(texts, textLine.start, textLine.len);
+          ntxts.push(segments);
         }
       } else {
-        ntxts.push(it);
+        ntxts.push(texts);
       }
     });
     const txtHeight = (ntxts.length - 1) * (font.size + 2);
     let ty = box.texty(valign, txtHeight);
-    ntxts.forEach((txt) => {
-      const txtWidth = ctx.measureText(txt).width;
-      this.fillText(txt, tx, ty);
-      if (strike) {
-        drawFontLine.call(this, 'strike', tx, ty, align, valign, font.size, txtWidth);
-      }
-      if (underline) {
-        drawFontLine.call(this, 'underline', tx, ty, align, valign, font.size, txtWidth);
+    ntxts.forEach((txts) => {
+      let dx = 0;
+      for (const txt of txts) {
+        const txtWidth = ctx.measureText(txt.text).width;
+        if (!txt.el) {
+          this.fillText(txt.text, tx + dx, ty);
+        }
+        if (strike) {
+          drawFontLine.call(this, 'strike', tx + dx, ty, align, valign, font.size, txtWidth);
+        }
+        if (underline) {
+          drawFontLine.call(this, 'underline', tx + dx, ty, align, valign, font.size, txtWidth);
+        }
+        if (txt.el && this.clickableElementsContainer) {
+          this.clickableElementsContainer.el.innerHTML += '<div class="spreadsheet-trigger-container"><div class="spreadsheet-trigger">' + txt.el.finder.render(txt.text, txt.el.data) + '</div></div>';
+          const elem = this.clickableElementsContainer.el.children[this.clickableElementsContainer.el.children.length - 1];
+          const elem2 = elem.children[0];
+          elem.style.width = box.width + 'px';
+          elem.style.height = box.height + 'px';
+          elem.style.left = box.x + 'px';
+          elem.style.top = box.y + 'px';
+          elem2.style.left = (tx + dx + 6 - box.x) + 'px';
+          elem2.style.top = (ty - 8 - box.y) + 'px';
+          elem2.addEventListener("click", evt => {
+            if (evt.ctrlKey) {
+              txt.el.finder.onCtrlClick(txt.el.data);
+            }
+          });
+        }
+        dx += txtWidth;
       }
       ty += font.size + 2;
     });
     ctx.restore();
     return this;
   }
+  
+  getTextSegments(texts, start, length) {
+    const segments = [];
+    let prevLen = 0;
+    for (const data of texts) {
+      const dataStart = prevLen;
+      prevLen = dataStart + data.text.length;
+      const dataEnd = dataStart + data.text.length;
+      if (dataEnd < start || dataStart > start + length) {
+        continue;
+      }
+      if (dataStart >= start && dataEnd <= start + length) {
+        segments.push(data);
+        continue;
+      }
+      if (dataStart >= start && dataEnd > start + length) {
+        // rm tail
+        const d = data.text.length - (dataEnd - (start + length));
+        segments.push({
+          text: data.text.substr(0, d),
+          el: data.el,
+        });
+        continue;
+      }
+      if (dataStart < start && dataEnd <= start + length) {
+        // rm head
+        const d = start - dataStart;
+        segments.push({
+          text: data.text.substr(d),
+          el: data.el,
+        });
+        continue;
+      }
+      if (dataStart < start && dataEnd <= start + length) {
+        // rm head & tail
+        const d1 = start - dataStart;
+        const d2 = data.text.length - (dataEnd - (start + length));
+        segments.push({
+          text: data.text.substr(d1, d2),
+          el: data.el,
+        });
+        continue;
+      }
+    }
+    return segments;
+  }
+  
+  parseClickableElements(text) {
+    if (!this.clickableElementFinders) {
+      return [];
+    }
+    const els = [];
+    const texts = [];
+    for (const finder of this.clickableElementFinders) {
+      const found = finder.finder(text);
+      els.push(...found.map(x => {
+        x.finder = finder;
+        return x;
+      }));
+    }
+    const idxsToRemove = [];
+    for (let i = 0; i < els.length; ++i) {
+      const el = els[i];
+      for (let j = 0; j < els.length; ++j) {
+        if (i === j) {
+          continue;
+        }
+        const el2 = els[j];
+        if (el.start >= el2.start && el.start < el2.start + el2.length) {
+          idxsToRemove.push(i);
+          break;
+        }
+      }
+    }
+    for (let i = idxsToRemove.length - 1; i >= 0; --i) {
+      els.splice(idxsToRemove[i], 1);
+    }
+    for (const idx in els) {
+      const el = els[idx];
+      const left = text.substr(0, el.start);
+      const forEl = text.substr(el.start, el.length);
+      const right = text.substr(el.start + el.length);
+      if (left.length > 0) {
+        texts.push({ text: left });
+      }
+      texts.push({
+        text: ' '.repeat(el.extraPreSpaces) + forEl + ' '.repeat(el.extraPostSpaces),
+        el: el,
+      });
+      if (right.length > 0 && parseInt(idx) + 1 === els.length) {
+        texts.push({ text: right });
+      }
+    }
+    
+    if (texts.length === 0) {
+      texts.push({ text: text });
+    }
+    
+    let newText = texts.map(txt => txt.text).join('');
+    
+    return [els, newText, texts];
+  }
+
+  // parseClickableElements(text) {
+  //   if (!this.clickableElementFinders) {
+  //     return [];
+  //   }
+  //   const els = [];
+  //   let newText = text;
+  //   const texts = [];
+  //   for (const finder of this.clickableElementFinders) {
+  //     els.push(...finder.finder(text));
+  //   }
+  //   let deltaLen = 0;
+  //   for (const el of els) {
+  //     el.start += deltaLen;
+  //     if (el.extraPreSpaces) {
+  //       newText = newText.substr(0, el.start) + ' '.repeat(el.extraPreSpaces) + newText.substr(el.start);
+  //       deltaLen += el.extraPreSpaces;
+  //     }
+  //     if (el.extraPostSpaces) {
+  //       newText = newText.substr(0, el.start + el.length + el.extraPreSpaces) + ' '.repeat(el.extraPostSpaces) + newText.substr(el.start + el.length + el.extraPreSpaces);
+  //       deltaLen += el.extraPostSpaces;
+  //     }
+  //     el.length += el.extraPreSpaces + el.extraPostSpaces;
+  //   }
+    
+  //   let s = newText;
+  //   for (const el of els) {
+      
+  //   }
+    
+  //   return [els, newText, texts];
+  // }
 
   border(style, color) {
     const { ctx } = this;

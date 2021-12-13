@@ -286,6 +286,12 @@ declare module 'x-data-spreadsheet' {
      * @param render
      */
     static addCustomFormula(key: string, title: string, render: (arr: (number|string)[]) => number|string): void;
+    /**
+     * add clickable element finder
+     * @param finder
+     * @param onCtrlClick
+     */
+    static addClickableElementFinder(finder: (text: string) => Array<{ start: number, length: number, extraPreSpaces: number, extraPostSpaces: number, data: string }>, render: (text: string, data: string) => string, onCtrlClick: (data: string) => void): void;
   }
   global {
     interface Window {
