@@ -298,7 +298,7 @@ function renderFreezeHighlightLine(fw, fh, ftw, fth) {
 class Table {
   constructor(el, data, spreadsheet, clickableElementsInner) {
     this.el = el;
-    this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), spreadsheet.getClickableElementFinders(), clickableElementsInner);
+    this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), spreadsheet.getClickableElementFinders(), clickableElementsInner, spreadsheet);
     this.data = data;
     this.spreadsheet = spreadsheet;
     this.clickableElementsInner = clickableElementsInner;

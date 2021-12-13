@@ -131,13 +131,14 @@ function drawFontLine(type, tx, ty, align, valign, blheight, blwidth) {
 }
 
 class Draw {
-  constructor(el, width, height, clickableElementFinders, clickableElementsContainer) {
+  constructor(el, width, height, clickableElementFinders, clickableElementsContainer, spreadsheet) {
     this.el = el;
     this.ctx = el.getContext('2d');
     this.resize(width, height);
     this.ctx.scale(dpr(), dpr());
     this.clickableElementFinders = clickableElementFinders;
-    this.clickableElementsContainer = clickableElementsContainer
+    this.clickableElementsContainer = clickableElementsContainer;
+    this.spreadsheet = spreadsheet;
   }
 
   resize(width, height) {
@@ -284,7 +285,7 @@ class Draw {
           elem2.style.top = (ty - 8 - box.y) + 'px';
           elem2.addEventListener("click", evt => {
             if (evt.ctrlKey) {
-              txt.el.finder.onCtrlClick(txt.el.data);
+              txt.el.finder.onCtrlClick.call(this.spreadsheet, txt.el.data);
             }
           });
         }
