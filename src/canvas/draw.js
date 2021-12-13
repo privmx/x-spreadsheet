@@ -274,7 +274,7 @@ class Draw {
           drawFontLine.call(this, 'underline', tx + dx, ty, align, valign, font.size, txtWidth);
         }
         if (txt.el && this.clickableElementsContainer) {
-          this.clickableElementsContainer.el.innerHTML += '<div class="spreadsheet-trigger-container"><div class="spreadsheet-trigger">' + txt.el.finder.render(txt.text, txt.el.data) + '</div></div>';
+          this.clickableElementsContainer.el.innerHTML += '<div class="spreadsheet-trigger-container"><div class="spreadsheet-trigger">' + txt.el.finder.render.call(this.spreadsheet, txt.text, txt.el.data) + '</div></div>';
           const elem = this.clickableElementsContainer.el.children[this.clickableElementsContainer.el.children.length - 1];
           const elem2 = elem.children[0];
           elem.style.width = box.width + 'px';
