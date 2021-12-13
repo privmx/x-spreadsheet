@@ -32,15 +32,15 @@
           res.push({
             start: match.index,
             length: match[0].length,
-            extraPreSpaces: 2,
-            extraPostSpaces: 5,
+            extraPreSpaces: 0,
+            extraPostSpaces: 0,
             data: match[0],
           });
         }
         return res;
       }
       function render(text, data) {
-        return '<span style="background:#ff0000;">' + text + '</span>';
+        return '<span style="color:#0055cc;">' + text + '</span>';
       }
       function onCtrlClick(data) {
         console.log('custom click: "' + data + '"');
