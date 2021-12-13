@@ -403,7 +403,7 @@ function overlayerMousedown(evt) {
   let { offsetX, offsetY } = evt;
   const trigger = evt.target.closest('.spreadsheet-trigger');
   if (trigger) {
-    if (evt.ctrlKey) {
+    if (evt.ctrlKey || evt.metaKey) {
       return;
     }
     const rect = this.overlayerEl.el.getBoundingClientRect();
@@ -440,7 +440,17 @@ function overlayerMousedown(evt) {
     // mouse move up
     mouseMoveUp(window, (e) => {
       // console.log('mouseMoveUp::::');
-      ({ ri, ci } = data.getCellRectByXY(e.offsetX, e.offsetY));
+      const trigger = e.target.closest('.spreadsheet-trigger');
+      let { offsetX, offsetY } = e;
+      if (trigger) {
+        if (e.ctrlKey || e.metaKey) {
+          return;
+        }
+        const rect = this.overlayerEl.el.getBoundingClientRect();
+        offsetX = e.clientX - rect.x;
+        offsetY = e.clientY - rect.y;
+      }
+      ({ ri, ci } = data.getCellRectByXY(offsetX, offsetY));
       if (isAutofillEl) {
         selector.showAutofill(ri, ci);
       } else if (e.buttons === 1 && !e.shiftKey) {

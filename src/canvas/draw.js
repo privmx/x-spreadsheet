@@ -286,7 +286,7 @@ class Draw {
           elem2.style.left = (tx + dx + 6 - box.x) + 'px';
           elem2.style.top = (ty - 8 - box.y) + 'px';
           elem2.addEventListener("click", evt => {
-            if (evt.ctrlKey) {
+            if (evt.ctrlKey || evt.metaKey) {
               txt.el.finder.onCtrlClick.call(this.spreadsheet, txt.el.data);
             }
           });
