@@ -83,13 +83,13 @@
             hashIdEndIdx = i;
             break;
           }
-          if ((c < '0' || c > '9')) {
+          if (c < '0' || c > '9') {
             return false;
           }
         }
-          if (hashIdEndIdx < 0 && selection.end === text.length) {
-            hashIdEndIdx = selection.end;
-          }
+        if (hashIdEndIdx < 0 && selection.end === text.length) {
+          hashIdEndIdx = selection.end;
+        }
         if (hashIdStartIdx < 0 || hashIdEndIdx < 0) {
           return false;
         }
@@ -106,7 +106,6 @@
         if (!range) {
           return false;
         }
-        const hashId = text.substr(range.start, range.end - range.start);
         return {
           html: 'Press F2 to insert a random hash-id',
           triggers: [
@@ -122,7 +121,6 @@
         if (!range) {
           return false;
         }
-        const hashId = text.substr(range.start, range.end - range.start);
         const prefix = text.substr(0, range.start);
         const suffix = text.substr(range.end);
         const newHashId = getRandomHashId();
