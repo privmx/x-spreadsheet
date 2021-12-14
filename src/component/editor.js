@@ -184,12 +184,13 @@ function dateFormat(d) {
 }
 
 export default class Editor {
-  constructor(formulas, viewFn, rowHeight, moveCursorFn, suggestFormulas, choosers) {
+  constructor(formulas, viewFn, rowHeight, moveCursorFn, suggestFormulas, choosers, spreadsheet) {
     this.viewFn = viewFn;
     this.rowHeight = rowHeight;
     this.formulas = formulas;
     this.moveCursorFn = moveCursorFn;
     this.choosers = choosers;
+    this.spreadsheet = spreadsheet;
     this.suggest = new Suggest(formulas, (it) => {
       suggestItemClick.call(this, it);
     }, '200px', !suggestFormulas);
@@ -346,7 +347,7 @@ export default class Editor {
     let hint = null;
     let currentChooser = null;
     for (const chooser of this.choosers) {
-      const chooserHint = chooser.getHint(text, selection);
+      const chooserHint = chooser.getHint.call(this.spreadsheet, text, selection);
       if (chooserHint !== false) {
         hint = chooserHint;
         currentChooser = chooser;
@@ -417,7 +418,7 @@ export default class Editor {
       start: this.textEl.el.selectionStart,
       end: this.textEl.el.selectionEnd,
     };
-    const res = this.currentChooser.onTriggered(text, selection);
+    const res = this.currentChooser.onTriggered.call(this.spreadsheet, text, selection);
     if (!res) {
       return;
     }

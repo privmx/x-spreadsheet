@@ -1007,6 +1007,7 @@ export default class Sheet {
       },
       data.settings.suggestFormulas,
       this.spreadsheet.getChoosers(),
+      this.spreadsheet,
     );
     // data validation
     this.modalValidation = new ModalValidation();
