@@ -13,6 +13,11 @@ function addClickableElementFinder(finder, render, onCtrlClick) {
   clickableElementFinders.push({ finder, render, onCtrlClick });
 }
 
+const choosers = [];
+function addChooser(getHint, onTriggered) {
+  choosers.push({ getHint, onTriggered });
+}
+
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -151,6 +156,10 @@ class Spreadsheet {
   getClickableElementFinders() {
     return clickableElementFinders;
   }
+  
+  getChoosers() {
+    return choosers;
+  }
 
   static locale(lang, message) {
     locale(lang, message);
@@ -163,6 +172,10 @@ class Spreadsheet {
   static addClickableElementFinder(finder, render, onCtrlClick) {
     addClickableElementFinder(finder, render, onCtrlClick);
   }
+  
+  static addChooser(getHint, onTriggered) {
+    addChooser(getHint, onTriggered);
+  }
 }
 
 const spreadsheet = (el, options = {}) => new Spreadsheet(el, options);
@@ -172,6 +185,7 @@ if (window) {
   window.x_spreadsheet.locale = (lang, message) => locale(lang, message);
   window.x_spreadsheet.addCustomFormula = (key, title, render) => addCustomFormula(key, title, render);
   window.x_spreadsheet.addClickableElementFinder = (finder, render, onCtrlClick) => addClickableElementFinder(finder, render, onCtrlClick);
+  window.x_spreadsheet.addChooser = (getHint, onTriggered) => addChooser(getHint, onTriggered);
 }
 
 export default Spreadsheet;

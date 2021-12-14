@@ -26,6 +26,9 @@
         }
         return Math.sqrt(x);
       });
+      
+      
+      
       function finder(text) {
         const res = [];
         for (const match of text.matchAll(/https?:\/\/[^\s\)]+/g)) {
@@ -46,6 +49,101 @@
         console.log('custom click: "' + data + '"');
       }
       x_spreadsheet.addClickableElementFinder(finder, render, onCtrlClick);
+      
+      
+      
+      function getHashIdRange(text, selection) {
+        for (let i = selection.start; i < selection.end; ++i) {
+          const c = text[i];
+          if (c !== '#' && (c < '0' || c > '9')) {
+            return false;
+          }
+        }
+        let hashIdStartIdx = -1;
+        let hashIdEndIdx = -1;
+        for (let i = selection.start - 1; i >= 0; --i) {
+          const c = text[i];
+          if (c === '#') {
+            let c2 = i > 0 ? text[i - 1] : ' ';
+            if (c2 == ' ' || c2 == '\n' || c2 == '\t' || c2 == '\r') {
+              hashIdStartIdx = i;
+              break;
+            }
+            else {
+              return false;
+            }
+          }
+          else if (c < '0' || c > '9') {
+            return false;
+          }
+        }
+        for (let i = selection.end; i < text.length; ++i) {
+          const c = text[i];
+          if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {
+            hashIdEndIdx = i;
+            break;
+          }
+          if ((c < '0' || c > '9')) {
+            return false;
+          }
+        }
+          if (hashIdEndIdx < 0 && selection.end === text.length) {
+            hashIdEndIdx = selection.end;
+          }
+        if (hashIdStartIdx < 0 || hashIdEndIdx < 0) {
+          return false;
+        }
+        return {
+          start: hashIdStartIdx,
+          end: hashIdEndIdx,
+        };
+      }
+      function getHint(text, selection) {
+        if (selection.start === 0) {
+          return false;
+        }
+        const range = getHashIdRange(text, selection);
+        if (!range) {
+          return false;
+        }
+        const hashId = text.substr(range.start, range.end - range.start);
+        return {
+          html: 'Press F2 to insert a random hash-id',
+          triggers: [
+            { keyCode: 113 }, // F2
+          ],
+        };
+      }
+      function onTriggered(text, selection) {
+        if (selection.start === 0) {
+          return false;
+        }
+        const range = getHashIdRange(text, selection);
+        if (!range) {
+          return false;
+        }
+        const hashId = text.substr(range.start, range.end - range.start);
+        const prefix = text.substr(0, range.start);
+        const suffix = text.substr(range.end);
+        const newHashId = getRandomHashId();
+        const newText = prefix + newHashId + suffix;
+        const hashIdEndIdx = prefix.length + newHashId.length;
+        return Promise.resolve({
+          text: newText,
+          cursorPosition: { start: hashIdEndIdx, end: hashIdEndIdx },
+        });
+      }
+      function getRandomHashId() {
+        let id = '';
+        while (id.length < 3) {
+          id += Math.round(Math.random() * 1000000).toString();
+        }
+        return '#' + id;
+      }
+      x_spreadsheet.addChooser(getHint, onTriggered);
+      
+      
+      
       const rows10 = { len: 1000 };
       for (let i = 0; i < 1000; i += 1) {
         rows10[i] = {

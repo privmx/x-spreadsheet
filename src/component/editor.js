@@ -47,12 +47,18 @@ function insertText({ target }, itxt) {
 
 function keydownEventHandler(evt) {
   const { keyCode, altKey, shiftKey } = evt;
+  this.checkChooserTrigger(evt);
   if (keyCode === 38 || keyCode === 40) {
     this.clear();
     if (this.moveCursorFn) {
       this.moveCursorFn(keyCode === 38 ? -1 : 1, shiftKey);
     }
     return;
+  }
+  if (keyCode === 37 || keyCode === 39) {
+    setTimeout(() => {
+      this.toggleChooserHint();
+    }, 0);
   }
   if (keyCode !== 13 && keyCode !== 9) evt.stopPropagation();
   if (keyCode === 13 && altKey) {
@@ -65,6 +71,10 @@ function keydownEventHandler(evt) {
     this.change('input', this.inputText);
     this.clear();
   }
+}
+
+function clickEventHandler(evt) {
+  this.toggleChooserHint();
 }
 
 function inputEventHandler(evt) {
@@ -89,6 +99,7 @@ function inputEventHandler(evt) {
           suggest.hide();
         }
       }
+      this.toggleChooserHint();
       textlineEl.html(v);
       resetTextareaSize.call(this);
       this.change('input', v);
@@ -111,6 +122,7 @@ function inputEventHandler(evt) {
         suggest.hide();
       }
     }
+    this.toggleChooserHint();
     textlineEl.html(v);
     resetTextareaSize.call(this);
     this.change('input', v);
@@ -122,6 +134,7 @@ function setTextareaRange(position) {
   setTimeout(() => {
     el.focus();
     el.setSelectionRange(position, position);
+    this.toggleChooserHint();
   }, 0);
 }
 
@@ -171,11 +184,12 @@ function dateFormat(d) {
 }
 
 export default class Editor {
-  constructor(formulas, viewFn, rowHeight, moveCursorFn, suggestFormulas) {
+  constructor(formulas, viewFn, rowHeight, moveCursorFn, suggestFormulas, choosers) {
     this.viewFn = viewFn;
     this.rowHeight = rowHeight;
     this.formulas = formulas;
     this.moveCursorFn = moveCursorFn;
+    this.choosers = choosers;
     this.suggest = new Suggest(formulas, (it) => {
       suggestItemClick.call(this, it);
     }, '200px', !suggestFormulas);
@@ -190,7 +204,8 @@ export default class Editor {
         this.textEl = h('textarea', '')
           .on('input', evt => inputEventHandler.call(this, evt))
           .on('paste.stop', () => {})
-          .on('keydown', evt => keydownEventHandler.call(this, evt)),
+          .on('keydown', evt => keydownEventHandler.call(this, evt))
+          .on('click', evt => clickEventHandler.call(this, evt)),
         this.textlineEl = h('div', 'textline'),
         this.suggest.el,
         this.datepicker.el,
@@ -228,6 +243,7 @@ export default class Editor {
     this.textlineEl.html('');
     resetSuggestItems.call(this);
     this.datepicker.hide();
+    this.hideChooserHint();
   }
 
   setOffset(offset, suggestPosition = 'top') {
@@ -315,6 +331,104 @@ export default class Editor {
   
   isEnteringFormula() {
     return this.inputText && this.inputText.startsWith('=');
+  }
+  
+  toggleChooserHint() {
+    if (document.activeElement != this.textEl.el) {
+      return;
+    }
+    const text = this.inputText;
+    const selection = {
+      start: this.textEl.el.selectionStart,
+      end: this.textEl.el.selectionEnd,
+    };
+    
+    let hint = null;
+    let currentChooser = null;
+    for (const chooser of this.choosers) {
+      const chooserHint = chooser.getHint(text, selection);
+      if (chooserHint !== false) {
+        hint = chooserHint;
+        currentChooser = chooser;
+        break;
+      }
+    }
+    
+    if (hint) {
+      this.showChooserHint(hint.html, hint, currentChooser);
+    }
+    else {
+      this.hideChooserHint();
+    }
+  }
+  
+  showChooserHint(html, hint, chooser) {
+    if (!this.chooserHintEl) {
+      this.chooserHintEl = h('div', `${cssPrefix}-chooser-hint`);
+      this.areaEl.child(this.chooserHintEl);
+    }
+    this.chooserHintEl.el.innerHTML = html;
+    this.currentChooserHint = hint;
+    this.currentChooser = chooser;
+  }
+  
+  hideChooserHint() {
+    if (this.chooserHintEl) {
+      try {
+        this.areaEl.removeChild(this.chooserHintEl);
+      }
+      catch {
+      }
+      try {
+        this.chooserHintEl.el.remove();
+      }
+      catch {
+      }
+      this.currentChooser = null;
+      this.currentChooserHint = null;
+      this.chooserHintEl = null;
+    }
+  }
+
+  checkChooserTrigger(evt) {
+    if (!this.currentChooser) {
+      return;
+    }
+    const trigger = this.currentChooserHint.triggers.filter(trigger => {
+      if (evt.keyCode !== trigger.keyCode) {
+        return false;
+      }
+      if (typeof(trigger.ctrlOrMeta) === 'boolean' && (evt.ctrlKey !== trigger.ctrlOrMeta && evt.metaKey !== trigger.ctrlOrMeta)) {
+        return false;
+      }
+      if (typeof(trigger.shift) === 'boolean' && evt.shiftKey !== trigger.shift) {
+        return false;
+      }
+      if (typeof(trigger.alt) === 'boolean' && evt.altKey !== trigger.alt) {
+        return false;
+      }
+      return true;
+    })[0];
+    if (!trigger) {
+      return;
+    }
+    const text = this.inputText;
+    const selection = {
+      start: this.textEl.el.selectionStart,
+      end: this.textEl.el.selectionEnd,
+    };
+    const res = this.currentChooser.onTriggered(text, selection);
+    if (!res) {
+      return;
+    }
+    res.then(data => {
+      const { text, cursorPosition } = data;
+      this.setText(text);
+      this.setCursorPosition(cursorPosition.start, cursorPosition.end);
+      setTimeout(() => {
+        this.setCursorPosition(cursorPosition.start, cursorPosition.end);
+      }, 0);
+    });
   }
   
 }

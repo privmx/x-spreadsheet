@@ -285,13 +285,31 @@ declare module 'x-data-spreadsheet' {
      * @param title
      * @param render
      */
-    static addCustomFormula(key: string, title: string, render: (arr: (number|string)[]) => number|string): void;
+    static addCustomFormula(
+      key: string,
+      title: string,
+      render: (arr: (number|string)[]) => number|string
+    ): void;
     /**
      * add clickable element finder
      * @param finder
+     * @param render
      * @param onCtrlClick
      */
-    static addClickableElementFinder(finder: (text: string) => Array<{ start: number, length: number, extraPreSpaces: number, extraPostSpaces: number, data: string }>, render: (text: string, data: string) => string, onCtrlClick: (data: string) => void): void;
+    static addClickableElementFinder(
+      finder: (text: string) => Array<{ start: number, length: number, extraPreSpaces: number, extraPostSpaces: number, data: string }>,
+      render: (text: string, data: string) => string,
+      onCtrlClick: (data: string) => void
+    ): void;
+    /**
+     * add chooser
+     * @param getHint
+     * @param onTriggered
+     */
+    static addChooser(
+      getHint: (text: string, selection: { start: number, end: number}) => { html: string, triggers: Array<{ keyCode: number, ctrlOrMeta?: boolean, shift?: boolean, alt?: boolean }> } | false,
+      onTriggered: (text: string, selection: { start: number, end: number}) => Promise<{ text: string, cursorPosition: { start: number, end: number} } | false>,
+    ): void;
   }
   global {
     interface Window {
