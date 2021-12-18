@@ -491,11 +491,11 @@ function editorSetOffset() {
   });
 }
 
-function editorSet(initialText) {
+function editorSet(initialText, viaF2) {
   const { editor, data } = this;
   if (data.settings.mode === 'read') return;
   editorSetOffset.call(this);
-  editor.setCell(data.getSelectedCell(), data.getSelectedValidator(), initialText);
+  editor.setCell(data.getSelectedCell(), data.getSelectedValidator(), initialText, viaF2);
   clearClipboard.call(this);
 }
 
@@ -961,7 +961,7 @@ function sheetInitEvents() {
         editorSet.call(this, initialText);
       } else if (keyCode === 113) {
         // F2
-        editorSet.call(this);
+        editorSet.call(this, null, true);
       }
     }
   });
@@ -997,12 +997,12 @@ export default class Sheet {
       formulas,
       () => this.getTableOffset(),
       data.rows.height,
-      (direction, shiftKey) => {
+      (direction, shiftKey, horizontal) => {
         if (direction < 0) {
-          selectorMove.call(this, shiftKey, 'up');
+          selectorMove.call(this, shiftKey, horizontal ? 'left' : 'up');
         }
         else if (direction > 0) {
-          selectorMove.call(this, shiftKey, 'down');
+          selectorMove.call(this, shiftKey, horizontal ? 'right' : 'down');
         }
       },
       data.settings.suggestFormulas,

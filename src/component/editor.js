@@ -48,14 +48,32 @@ function insertText({ target }, itxt) {
 function keydownEventHandler(evt) {
   const { keyCode, altKey, shiftKey } = evt;
   this.checkChooserTrigger(evt);
+  const arrowExits = !this.viaF2;
   if (keyCode === 38 || keyCode === 40) {
-    this.clear();
-    if (this.moveCursorFn) {
-      this.moveCursorFn(keyCode === 38 ? -1 : 1, shiftKey);
+    if (arrowExits) {
+      this.clear();
+      if (this.moveCursorFn) {
+        this.moveCursorFn(keyCode === 38 ? -1 : 1, shiftKey, false);
+      }
+    }
+    else {
+      if (keyCode == 38) {
+        this.setCursorPosition(0);
+      }
+      else if (keyCode == 40) {
+        this.setCursorPosition(this.inputText.length);
+      }
     }
     return;
   }
   if (keyCode === 37 || keyCode === 39) {
+    if (arrowExits) {
+      this.clear();
+      if (this.moveCursorFn) {
+        this.moveCursorFn(keyCode === 37 ? -1 : 1, shiftKey, true);
+      }
+      return;
+    }
     setTimeout(() => {
       this.toggleChooserHint();
     }, 0);
@@ -279,7 +297,7 @@ export default class Editor {
     }
   }
 
-  setCell(cell, validator, initialText) {
+  setCell(cell, validator, initialText, viaF2) {
     // console.log('::', validator);
     const { el, datepicker, suggest } = this;
     el.show();
@@ -287,6 +305,7 @@ export default class Editor {
     const text = (cell && cell.text) || '';
     this.setText(text);
     this.initialText = typeof(initialText) === "string" ? initialText : text;
+    this.viaF2 = !!viaF2;
 
     this.validator = validator;
     if (validator) {
