@@ -16,7 +16,10 @@ const infixExprToSuffixExpr = (src) => {
   for (let i = 0; i < src.length; i += 1) {
     const c = src.charAt(i);
     if (c !== ' ') {
-      if (c >= 'a' && c <= 'z') {
+      if (c == '#' && src.substr(i, 4).toUpperCase() == '#REF') {
+        stack.push('"#REF"');
+        i += 3;
+      } else if (c >= 'a' && c <= 'z') {
         subStrs.push(c.toUpperCase());
       } else if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || c === '.' || c == '$') {
         subStrs.push(c);
@@ -242,7 +245,7 @@ const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList)
       stack.push(formulaMap[formula].render.call(spreadsheet, params.reverse()));
     } else {
       if (cellList.includes(expr)) {
-        return "#ERR";
+        return '#ERR';
       }
       if ((fc >= 'a' && fc <= 'z') || (fc >= 'A' && fc <= 'Z')) {
         cellList.push(expr);
@@ -253,7 +256,7 @@ const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList)
     // console.log('stack:', stack);
   }
   if (isNaN(stack[0])) {
-    return "#ERR";
+    return '#ERR';
   }
   return stack[0];
 };

@@ -1,5 +1,5 @@
 import helper from './helper';
-import { expr2expr } from './alphabet';
+import { expr2expr, expr2xy } from './alphabet';
 
 class Rows {
   constructor({ len, height }) {
@@ -233,6 +233,19 @@ class Rows {
           }
         });
       }
+      else {
+        this.eachCells(ri, (ci, cell) => {
+          if (cell.text && cell.text[0] === '=') {
+            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+              const [x, y] = expr2xy(word);
+              if (y < sri) {
+                return word;
+              }
+              return expr2expr(word, 0, n, (x, y) => y >= sri);
+            });
+          }
+        });
+      }
       ndata[nri] = row;
     });
     this._ = ndata;
@@ -243,9 +256,31 @@ class Rows {
     const n = eri - sri + 1;
     const ndata = {};
     this.each((ri, row) => {
+      this.eachCells(ri, (ci, cell) => {
+        cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+          const [x, y] = expr2xy(word);
+          if (y >= sri && y <= eri) {
+            return '#REF';
+          }
+          return word;
+        });
+      });
+    });
+    this.each((ri, row) => {
       const nri = parseInt(ri, 10);
       if (nri < sri) {
         ndata[nri] = row;
+        this.eachCells(ri, (ci, cell) => {
+          if (cell.text && cell.text[0] === '=') {
+            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+              const [x, y] = expr2xy(word);
+              if (y < sri) {
+                return word;
+              }
+              return expr2expr(word, 0, -n, (x, y) => y > eri);
+            });
+          }
+        });
       } else if (ri > eri) {
         ndata[nri - n] = row;
         this.eachCells(ri, (ci, cell) => {
@@ -270,6 +305,15 @@ class Rows {
             cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => expr2expr(word, n, 0, x => x >= sci));
           }
         }
+        else {
+          cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+            const [x, y] = expr2xy(word);
+            if (x < sci) {
+              return word;
+            }
+            return expr2expr(word, n, 0, x => x >= sci);
+          });
+        }
         rndata[nci] = cell;
       });
       row.cells = rndata;
@@ -279,11 +323,31 @@ class Rows {
   deleteColumn(sci, eci) {
     const n = eci - sci + 1;
     this.each((ri, row) => {
+      this.eachCells(ri, (ci, cell) => {
+        cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+          const [x, y] = expr2xy(word);
+          if (x >= sci && x <= eci) {
+            return '#REF';
+          }
+          return word;
+        });
+      });
+    });
+    this.each((ri, row) => {
       const rndata = {};
       this.eachCells(ri, (ci, cell) => {
         const nci = parseInt(ci, 10);
         if (nci < sci) {
           rndata[nci] = cell;
+          if (cell.text && cell.text[0] === '=') {
+            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+              const [x, y] = expr2xy(word);
+              if (x < sci) {
+                return word;
+              }
+              return expr2expr(word, -n, 0, x => x > eci);
+            });
+          }
         } else if (nci > eci) {
           rndata[nci - n] = cell;
           if (cell.text && cell.text[0] === '=') {
