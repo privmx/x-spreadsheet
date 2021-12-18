@@ -257,13 +257,15 @@ class Rows {
     const ndata = {};
     this.each((ri, row) => {
       this.eachCells(ri, (ci, cell) => {
-        cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
-          const [x, y] = expr2xy(word);
-          if (y >= sri && y <= eri) {
-            return '#REF';
-          }
-          return word;
-        });
+        if (cell.text && cell.text[0] === '=') {
+          cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+            const [x, y] = expr2xy(word);
+            if (y >= sri && y <= eri) {
+              return '#REF';
+            }
+            return word;
+          });
+        }
       });
     });
     this.each((ri, row) => {
@@ -306,13 +308,15 @@ class Rows {
           }
         }
         else {
-          cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
-            const [x, y] = expr2xy(word);
-            if (x < sci) {
-              return word;
-            }
-            return expr2expr(word, n, 0, x => x >= sci);
-          });
+          if (cell.text && cell.text[0] === '=') {
+            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+              const [x, y] = expr2xy(word);
+              if (x < sci) {
+                return word;
+              }
+              return expr2expr(word, n, 0, x => x >= sci);
+            });
+          }
         }
         rndata[nci] = cell;
       });
@@ -324,13 +328,15 @@ class Rows {
     const n = eci - sci + 1;
     this.each((ri, row) => {
       this.eachCells(ri, (ci, cell) => {
-        cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
-          const [x, y] = expr2xy(word);
-          if (x >= sci && x <= eci) {
-            return '#REF';
-          }
-          return word;
-        });
+        if (cell.text && cell.text[0] === '=') {
+          cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, word => {
+            const [x, y] = expr2xy(word);
+            if (x >= sci && x <= eci) {
+              return '#REF';
+            }
+            return word;
+          });
+        }
       });
     });
     this.each((ri, row) => {
