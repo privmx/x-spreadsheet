@@ -223,11 +223,10 @@ class Draw {
     const {
       align, valign, font, color, strike, underline,
     } = attr;
-    const tx = box.textx(align);
+    const baseTx = box.textx(align);
     ctx.save();
     ctx.beginPath();
     this.attr({
-      textAlign: align,
       textBaseline: valign,
       font: `${font.italic ? 'italic' : ''} ${font.bold ? 'bold' : ''} ${npx(font.size)}px ${font.name}`,
       fillStyle: color,
@@ -262,8 +261,23 @@ class Draw {
     let ty = box.texty(valign, txtHeight);
     ntxts.forEach((txts) => {
       let dx = 0;
+      const textWidths = [];
+      let totalWidth = 0;
       for (const txt of txts) {
         const txtWidth = ctx.measureText(txt.text).width;
+        textWidths.push(txtWidth);
+        totalWidth += txtWidth;
+      }
+      let tx = baseTx;
+      if (align == 'right') {
+        tx -= totalWidth;
+      }
+      else if (align == 'center') {
+        tx -= totalWidth / 2;
+      }
+      for (const i in txts) {
+        const txt = txts[i];
+        const txtWidth = textWidths[i];
         if (!txt.el) {
           this.fillText(txt.text, tx + dx, ty);
         }
@@ -283,8 +297,15 @@ class Draw {
           elem.style.height = box.height + 'px';
           elem.style.left = box.x + 'px';
           elem.style.top = box.y + 'px';
-          elem2.style.left = (tx + dx - box.x) + 'px';
-          elem2.style.top = (ty - 9 - box.y) + 'px';
+          elem2.style.left = Math.floor(tx + dx - box.x) + 'px';
+          let dt = 0;
+          if (valign == 'top') {
+            dt = (font.size + 2) / 2 - 1;
+          }
+          else if (valign == 'bottom') {
+            dt = -(font.size + 2) / 2 + 1;
+          }
+          elem2.style.top = Math.floor(ty - 8 - box.y + dt) + 'px';
           elem2.addEventListener("click", evt => {
             if (evt.ctrlKey || evt.metaKey) {
               txt.el.finder.onCtrlClick.call(this.spreadsheet, txt.el.data);
