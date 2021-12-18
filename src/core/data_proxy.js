@@ -154,9 +154,12 @@ const defaultSettings = {
   },
 };
 
+
+const formulaBarLocation = "nextToToolbar"; // nextToToolbar | belowToolbar
+
 const toolbarHeight = 41;
 const bottombarHeight = 41;
-const formulaBarHeight = 30;
+const formulaBarHeight = formulaBarLocation === "nextToToolbar" ? 0 : 30;
 
 // src: cellRange
 // dst: cellRange
