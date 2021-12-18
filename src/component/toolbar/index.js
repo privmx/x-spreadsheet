@@ -218,9 +218,6 @@ export default class Toolbar {
       if (Array.isArray(it)) {
         it.forEach((i) => {
           this.btns.child(i.el);
-          i.change = (...args) => {
-            this.change(...args);
-          };
         });
       } else {
         this.btns.child(it.el);
@@ -244,6 +241,9 @@ export default class Toolbar {
   
   createItem(creatorFunc, returnCondition) {
     const el = creatorFunc();
+    el.change = (...args) => {
+      this.change(...args);
+    };
     return returnCondition ? el : null;
   }
 
