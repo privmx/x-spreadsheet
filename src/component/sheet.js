@@ -685,9 +685,9 @@ function sheetInitEvents() {
           const isSingleCell = rangeStart === rangeEnd;
           const rangeText = isSingleCell ? rangeStart : `${rangeStart}:${rangeEnd}`;
           this.editor.injectText(rangeText, editorCursorPos[0], editorCursorPos[1]);
-          this.editor.setCursorPosition();
           this.spreadsheet.setSelectedRange({ row0: formulaCellRow, row1: formulaCellRow, col0: formulaCellCol, col1: formulaCellCol });
           this.editor.textEl.focus();
+          this.editor.setCursorPosition(editorCursorPos[0] + rangeText.length);
           setTimeout(() => {
             this.editor.setCursorPosition(editorCursorPos[0] + rangeText.length);
           }, 0);
