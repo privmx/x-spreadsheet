@@ -155,6 +155,9 @@ const defaultSettings = {
   formulaBar: {
     location: 'belowToolbar',
   },
+  contextMenu: {
+    itemsCallback: () => {},
+  },
 };
 
 

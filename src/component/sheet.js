@@ -972,7 +972,7 @@ export default class Sheet {
     this.spreadsheetEl = targetEl;
     this.spreadsheet = spreadsheet;
     this.eventMap = createEventEmitter();
-    const { view, showToolbar, showContextmenu, showContextMenuForCells, formulaBar } = data.settings;
+    const { view, showToolbar, showContextmenu, showContextMenuForCells, formulaBar, contextMenu } = data.settings;
     this.el = h('div', `${cssPrefix}-sheet`);
     this.toolbar = new Toolbar(data, view.width, !showToolbar);
     this.formulaBar = new FormulaBar(data.settings.mode !== 'read', formulaBar, value => {
@@ -1012,7 +1012,7 @@ export default class Sheet {
     // data validation
     this.modalValidation = new ModalValidation();
     // contextMenu
-    this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu, !showContextMenuForCells);
+    this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu, !showContextMenuForCells, contextMenu);
     // selector
     this.selector = new Selector(data);
     this.clickableElementsInner = h('div', `${cssPrefix}-overlayer-clickable-elements-inner`);

@@ -48,11 +48,16 @@ function buildMenuItem(item) {
 }
 
 function buildMenu() {
-  return menuItems.map(it => buildMenuItem.call(this, it));
+  const processedMenuItems = [...menuItems];
+  if (this.contextMenuOptions && this.contextMenuOptions.itemsCallback) {
+    this.contextMenuOptions.itemsCallback(processedMenuItems);
+  }
+  return processedMenuItems.map(it => buildMenuItem.call(this, it));
 }
 
 export default class ContextMenu {
-  constructor(viewFn, isHide = false, isHideForRange = false) {
+  constructor(viewFn, isHide = false, isHideForRange = false, contextMenuOptions = null) {
+    this.contextMenuOptions = contextMenuOptions;
     this.menuItems = buildMenu.call(this);
     this.el = h('div', `${cssPrefix}-contextmenu`)
       .children(...this.menuItems)
