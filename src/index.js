@@ -50,6 +50,20 @@ class Spreadsheet {
     if (this.bottombar !== null) {
       rootEl.child(this.bottombar.el);
     }
+    if (!window.xSpreadsheetCtrlKeyListener) {
+      let isBodyClassSet = false;
+      window.xSpreadsheetCtrlKeyListener = evt => {
+        let hasCtrlKey = evt.ctrlKey || evt.metaKey;
+        if (hasCtrlKey !== isBodyClassSet) {
+          isBodyClassSet = hasCtrlKey;
+          document.body.classList.toggle(`${cssPrefix}-has-ctrl-key`, hasCtrlKey);
+          document.body.classList.toggle(`${cssPrefix}-no-ctrl-key`, !hasCtrlKey);
+        }
+      };
+      window.addEventListener('mousemove', window.xSpreadsheetCtrlKeyListener);
+      window.addEventListener('keydown', window.xSpreadsheetCtrlKeyListener);
+      window.addEventListener('keyup', window.xSpreadsheetCtrlKeyListener);
+    }
   }
 
   addSheet(name, active = true) {

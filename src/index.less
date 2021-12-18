@@ -336,6 +336,12 @@ body {
       > * {
         position: absolute;
         pointer-events: auto;
+        body.@{css-prefix}-has-ctrl-key & {
+          cursor: pointer;
+        }
+        body.@{css-prefix}-no-ctrl-key & {
+          cursor: default;
+        }
       }
     }
   }
