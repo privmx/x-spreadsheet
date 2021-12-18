@@ -242,7 +242,7 @@ const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList)
       stack.push(formulaMap[formula].render.call(spreadsheet, params.reverse()));
     } else {
       if (cellList.includes(expr)) {
-        return 0;
+        return "#ERR";
       }
       if ((fc >= 'a' && fc <= 'z') || (fc >= 'A' && fc <= 'Z')) {
         cellList.push(expr);
