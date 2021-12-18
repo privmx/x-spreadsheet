@@ -40,8 +40,14 @@ const infixExprToSuffixExpr = (src) => {
           if (fnArgType === 2) {
             // fn argument range => A1:B5
             try {
-              const [ex, ey] = expr2xy(stack.pop());
-              const [sx, sy] = expr2xy(stack.pop());
+              let [ex, ey] = expr2xy(stack.pop());
+              let [sx, sy] = expr2xy(stack.pop());
+              if (ex < sx) {
+                [sx, ex] = [ex, sx];
+              }
+              if (ey < sy) {
+                [sy, ey] = [ey, sy];
+              }
               // console.log('::', sx, sy, ex, ey);
               let rangelen = 0;
               for (let x = sx; x <= ex; x += 1) {
