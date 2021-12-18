@@ -2,9 +2,10 @@ import { h } from './element';
 import { cssPrefix } from '../config';
 
 export default class FormulaBar {
-  constructor(editable, onInputCallback) {
+  constructor(editable, formulaBarOptions, onInputCallback) {
     this.editable = editable;
-    this.el = h('div', `${cssPrefix}-formulabar`)
+    this.formulaBarOptions = formulaBarOptions;
+    this.el = h('div', `${cssPrefix}-formulabar ${cssPrefix}-${formulaBarOptions.location === 'nextToToolbar' ? 'next-to-toolbar' : 'below-toolbar'}`)
       .child(
         this.inputEl = h('input', '')
           .on("keydown", evt => {

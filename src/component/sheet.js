@@ -972,10 +972,10 @@ export default class Sheet {
     this.spreadsheetEl = targetEl;
     this.spreadsheet = spreadsheet;
     this.eventMap = createEventEmitter();
-    const { view, showToolbar, showContextmenu, showContextMenuForCells } = data.settings;
+    const { view, showToolbar, showContextmenu, showContextMenuForCells, formulaBar } = data.settings;
     this.el = h('div', `${cssPrefix}-sheet`);
     this.toolbar = new Toolbar(data, view.width, !showToolbar);
-    this.formulaBar = new FormulaBar(data.settings.mode !== 'read', value => {
+    this.formulaBar = new FormulaBar(data.settings.mode !== 'read', formulaBar, value => {
       dataSetCellText.call(this, value, 'finished');
       if (this.editor.cell) {
         this.editor.setText(value);

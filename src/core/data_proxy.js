@@ -152,14 +152,15 @@ const defaultSettings = {
     itemsCallback: () => {},
     clipboard: undefined,
   },
+  formulaBar: {
+    location: 'belowToolbar',
+  },
 };
 
 
-const formulaBarLocation = "nextToToolbar"; // nextToToolbar | belowToolbar
-
 const toolbarHeight = 41;
 const bottombarHeight = 41;
-const formulaBarHeight = formulaBarLocation === "nextToToolbar" ? 0 : 30;
+const formulaBarHeight = 30;
 
 // src: cellRange
 // dst: cellRange
@@ -1084,7 +1085,7 @@ export default class DataProxy {
   }
 
   viewHeight() {
-    const { view, showToolbar, showBottomBar } = this.settings;
+    const { view, showToolbar, showBottomBar, formulaBar } = this.settings;
     let h = view.height();
     if (showBottomBar) {
       h -= bottombarHeight;
@@ -1092,7 +1093,9 @@ export default class DataProxy {
     if (showToolbar) {
       h -= toolbarHeight;
     }
-    h -= formulaBarHeight;
+    if (formulaBar.location === 'belowToolbar') {
+      h -= formulaBarHeight;
+    }
     return h;
   }
 

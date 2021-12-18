@@ -63,6 +63,7 @@ body {
 }
 
 .@{css-prefix} {
+  position: relative;
   font-size: 13px;
   line-height: normal;
   user-select: none;
@@ -651,6 +652,7 @@ body {
 }
 
 .@{css-prefix}-toolbar {
+  padding-left: 10px;
   border-bottom: 1px solid #e0e2e4;
 
   .@{css-prefix}-toolbar-btns {
@@ -699,6 +701,16 @@ body {
 
 .@{css-prefix}-formulabar {
   height: 30px;
+  &.@{css-prefix}-next-to-toolbar {
+    position: absolute;
+    left: 365px;
+    top: 5px;
+    right: 5px;
+  }
+  &.@{css-prefix}-below-toolbar input {
+    box-sizing: border-box;
+    border-bottom: 1px solid #e0e2e4;
+  }
   input {
     box-sizing: border-box;
     display: block;

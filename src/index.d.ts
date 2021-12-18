@@ -92,6 +92,9 @@ declare module 'x-data-spreadsheet' {
       };
       itemsCallback: (items: any|any[]) => void;
     };
+    formulaBar: {
+      location: 'belowToolbar' | 'nextToToolbar',
+    };
     clipboard?: {
       setText?: (text: string, event?: ClipboardEvent) => void;
       getText?: (event?: ClipboardEvent) => string | Promise<string>;
