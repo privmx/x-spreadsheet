@@ -92,7 +92,7 @@ declare module 'x-data-spreadsheet' {
       };
       itemsCallback: (items: any|any[]) => void;
     };
-    formulaBar: {
+    formulaBar?: {
       location: 'belowToolbar' | 'nextToToolbar',
     };
     clipboard?: {
