@@ -77,12 +77,16 @@ export default class ContextMenu {
     const hideEl = this.getItemByKey('hide');
     this.mode = mode;
     if (mode === 'row' || mode === 'col') {
-      hideEl.show();
+      if (hideEl) {
+        hideEl.show();
+      }
     } else {
       if (this.isHideForRange) {
         this.hide();
       }
-      hideEl.hide();
+      if (hideEl) {
+        hideEl.hide();
+      }
     }
     this.toggleShowRowElements(mode !== 'col');
     this.toggleShowColumnElements(mode !== 'row');
