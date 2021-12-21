@@ -255,7 +255,7 @@ const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList)
     }
     // console.log('stack:', stack);
   }
-  if (isNaN(stack[0])) {
+  if (typeof(stack[0]) === 'number' && isNaN(stack[0])) {
     return '#ERR';
   }
   return stack[0];

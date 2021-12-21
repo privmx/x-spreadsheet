@@ -118,6 +118,9 @@ export function numberCalc(type, a1, a2) {
   const al2 = digits(a2);
   const num1 = Number(a1);
   const num2 = Number(a2);
+  if (isNaN(num1) || isNaN(num2)) {
+    return Number.NaN;
+  }
   let ret = 0;
   if (type === '-') {
     ret = num1 - num2;
