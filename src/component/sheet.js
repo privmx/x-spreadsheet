@@ -958,6 +958,7 @@ function sheetInitEvents() {
       } else if ((keyCode >= 65 && keyCode <= 90)
         || (keyCode >= 48 && keyCode <= 57)
         || (keyCode >= 96 && keyCode <= 105)
+        || keyCode === 191
         || evt.key === '='
       ) {
         const selectedCell = this.data.getSelectedCell();
