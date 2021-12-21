@@ -20,7 +20,7 @@ export default class Item {
 
   element() {
     const { tip } = this;
-    return h('div', `${cssPrefix}-toolbar-btn`)
+    return h('div', `${cssPrefix}-toolbar-btn ${cssPrefix}-toolbar-btn--${this.tag}`)
       .on('mouseenter', (evt) => {
         if (this.tip) tooltip(this.tip, evt.target);
       })

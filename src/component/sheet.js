@@ -433,7 +433,13 @@ function overlayerMousedown(evt) {
   }
 
   // console.log('ri:', ri, ', ci:', ci);
-  if (!evt.shiftKey) {
+  const isColumnHeaderClick = ri < 0;
+  const isRowHeaderClick = ci < 0;
+  const { sci, eci, sri, eri } = this.selector.range;
+  const isSelectedColumnHeaderClick = isColumnHeaderClick && ci >= sci && ci <= eci;
+  const isSelectedRowHeaderClick = isRowHeaderClick && ri >= sri && ri <= eri;
+  const isSelectedHeaderRightClick = (isSelectedColumnHeaderClick || isSelectedRowHeaderClick) && evt.buttons === 2;
+  if (!evt.shiftKey && !isSelectedHeaderRightClick) {
     // console.log('selectorSetStart:::');
     if (isAutofillEl) {
       selector.showAutofill(ri, ci);
