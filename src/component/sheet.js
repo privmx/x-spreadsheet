@@ -290,6 +290,7 @@ function sheetFreeze() {
 
 function sheetReset() {
   const {
+    data,
     tableEl,
     overlayerEl,
     overlayerCEl,
@@ -310,6 +311,8 @@ function sheetReset() {
   table.render();
   toolbar.reset();
   selector.reset();
+  const cell = data.getSelectedCell();
+  this.formulaBar.reset(cell && cell.text ? cell.text : '');
 }
 
 function clearClipboard() {
@@ -356,6 +359,7 @@ function paste(what, evt) {
     const execPaste = () => {
       this.data.pasteFromText(cdata);
       sheetReset.call(this);
+      this.formulaBar.reset(cdata);
     };
     if (cdata instanceof Promise) {
       cdata.then(cdataNew => {
