@@ -397,14 +397,17 @@ class Draw {
     for (let i = idxsToRemove.length - 1; i >= 0; --i) {
       els.splice(idxsToRemove[i], 1);
     }
+    let prevEnd = -1;
     for (const idx in els) {
       const el = els[idx];
       const left = text.substr(0, el.start);
       const forEl = text.substr(el.start, el.length);
       const right = text.substr(el.start + el.length);
       if (left.length > 0) {
-        texts.push({ text: left });
+        const leftPartial = prevEnd < 0 ? left : left.substr(prevEnd);
+        texts.push({ text: leftPartial });
       }
+      prevEnd = el.start + el.length;
       texts.push({
         text: ' '.repeat(el.extraPreSpaces) + forEl + ' '.repeat(el.extraPostSpaces),
         el: el,
