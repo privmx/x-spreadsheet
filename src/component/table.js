@@ -77,6 +77,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
     font.size = getFontSizePxByPt(font.size);
     // console.log('style:', style);
     draw.text(cellText, dbox, {
+      hasAlignSet: style.hasAlignSet,
       align: style.align,
       valign: style.valign,
       font,

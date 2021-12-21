@@ -221,8 +221,9 @@ class Draw {
   text(mtxt, box, attr = {}, textWrap = true) {
     const { ctx } = this;
     const {
-      align, valign, font, color, strike, underline,
+      hasAlignSet, align: _align, valign, font, color, strike, underline,
     } = attr;
+    const align = (hasAlignSet || isNaN(mtxt)) ? _align : 'right';
     const baseTx = box.textx(align);
     ctx.save();
     ctx.beginPath();

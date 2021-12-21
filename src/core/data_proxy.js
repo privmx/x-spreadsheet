@@ -1033,7 +1033,9 @@ export default class DataProxy {
     const { styles, rows } = this;
     const cell = rows.getCell(ri, ci);
     const cellStyle = (cell && cell.style !== undefined) ? styles[cell.style] : {};
-    return helper.merge(this.defaultStyle(), cellStyle);
+    const newCellStyle = helper.merge(this.defaultStyle(), cellStyle);
+    newCellStyle.hasAlignSet = !!cellStyle.align;
+    return newCellStyle;
   }
 
   getSelectedCellStyle() {
