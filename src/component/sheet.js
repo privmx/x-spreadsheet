@@ -680,8 +680,9 @@ function sheetInitEvents() {
           const col1 = this.selector.range.eci;
           const row0 = this.selector.range.sri;
           const row1 = this.selector.range.eri;
-          const rangeStart = xy2expr(col0, row0);
-          const rangeEnd = xy2expr(col1, row1);
+          const isConstXY = evt.ctrlKey || evt.metaKey;
+          const rangeStart = xy2expr(col0, row0, isConstXY, isConstXY);
+          const rangeEnd = xy2expr(col1, row1, isConstXY, isConstXY);
           const isSingleCell = rangeStart === rangeEnd;
           const rangeText = isSingleCell ? rangeStart : `${rangeStart}:${rangeEnd}`;
           this.editor.injectText(rangeText, editorCursorPos[0], editorCursorPos[1]);
