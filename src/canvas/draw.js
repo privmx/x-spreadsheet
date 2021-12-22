@@ -338,29 +338,38 @@ class Draw {
       if (dataStart >= start && dataEnd > start + length) {
         // rm tail
         const d = data.text.length - (dataEnd - (start + length));
-        segments.push({
-          text: data.text.substr(0, d),
-          el: data.el,
-        });
+        const txt = data.text.substr(0, d);
+        if (txt.length > 0) {
+          segments.push({
+            text: txt,
+            el: data.el,
+          });
+        }
         continue;
       }
       if (dataStart < start && dataEnd <= start + length) {
         // rm head
         const d = start - dataStart;
-        segments.push({
-          text: data.text.substr(d),
-          el: data.el,
-        });
+        const txt = data.text.substr(d);
+        if (txt.length > 0) {
+          segments.push({
+            text: txt,
+            el: data.el,
+          });
+        }
         continue;
       }
-      if (dataStart < start && dataEnd <= start + length) {
+      if (dataStart < start && dataEnd > start + length) {
         // rm head & tail
         const d1 = start - dataStart;
         const d2 = data.text.length - (dataEnd - (start + length));
-        segments.push({
-          text: data.text.substr(d1, d2),
-          el: data.el,
-        });
+        const txt = data.text.substr(d1, d2 - d1);
+        if (txt.length > 0) {
+          segments.push({
+            text: txt,
+            el: data.el,
+          });
+        }
         continue;
       }
     }
@@ -403,15 +412,18 @@ class Draw {
       const left = text.substr(0, el.start);
       const forEl = text.substr(el.start, el.length);
       const right = text.substr(el.start + el.length);
-      if (left.length > 0) {
-        const leftPartial = prevEnd < 0 ? left : left.substr(prevEnd);
+      const leftPartial = prevEnd < 0 ? left : left.substr(prevEnd);
+      if (leftPartial.length > 0) {
         texts.push({ text: leftPartial });
       }
       prevEnd = el.start + el.length;
-      texts.push({
-        text: ' '.repeat(el.extraPreSpaces) + forEl + ' '.repeat(el.extraPostSpaces),
-        el: el,
-      });
+      const txt = ' '.repeat(el.extraPreSpaces) + forEl + ' '.repeat(el.extraPostSpaces);
+      if (txt.length > 0) {
+        texts.push({
+          text: txt,
+          el: el,
+        });
+      }
       if (right.length > 0 && parseInt(idx) + 1 === els.length) {
         texts.push({ text: right });
       }
