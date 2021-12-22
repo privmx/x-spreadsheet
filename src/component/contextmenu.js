@@ -11,10 +11,14 @@ const menuItems = [
   { key: 'paste-format', title: tf('contextmenu.pasteFormat'), label: 'Ctrl+Alt+V' },
   { key: 'divider' },
   { key: 'insert-row', title: tf('contextmenu.insertRow') },
+  { key: 'insert-rows', title: tf('contextmenu.insertRows') },
   { key: 'insert-column', title: tf('contextmenu.insertColumn') },
+  { key: 'insert-columns', title: tf('contextmenu.insertColumns') },
   { key: 'divider' },
   { key: 'delete-row', title: tf('contextmenu.deleteRow') },
+  { key: 'delete-rows', title: tf('contextmenu.deleteRows') },
   { key: 'delete-column', title: tf('contextmenu.deleteColumn') },
+  { key: 'delete-columns', title: tf('contextmenu.deleteColumns') },
   { key: 'delete-cell-text', title: tf('contextmenu.deleteCellText') },
   { key: 'hide', title: tf('contextmenu.hide') },
   { key: 'divider' },
@@ -66,30 +70,35 @@ export default class ContextMenu {
     this.itemClick = () => {};
     this.isHide = isHide;
     this.isHideForRange = isHideForRange;
-    this.setMode('range');
-    this.mode = 'range';
+    this.setTargetRange({ sci: 0, eci: 0, sri: 0, eri: 0 });
   }
 
-  // row: the whole rows
-  // col: the whole cols
-  // range: select range
-  setMode(mode) {
+  setTargetRange(range) {
     const hideEl = this.getItemByKey('hide');
+    let mode = 'range';
+    if (range.sci < 0) {
+      mode = 'row';
+    }
+    else if (range.sri < 0) {
+      mode = 'col';
+    }
     this.mode = mode;
-    if (mode === 'row' || mode === 'col') {
-      if (hideEl) {
-        hideEl.show();
-      }
-    } else {
+    if (mode === 'range') {
       if (this.isHideForRange) {
         this.hide();
       }
       if (hideEl) {
         hideEl.hide();
       }
+    } else {
+      if (hideEl) {
+        hideEl.show();
+      }
     }
-    this.toggleShowRowElements(mode !== 'col');
-    this.toggleShowColumnElements(mode !== 'row');
+    this.toggleShowSingleColumnElements(range.sci >= 0 && range.sci === range.eci);
+    this.toggleShowMultiColumnElements(range.sci >= 0 && range.sci !== range.eci);
+    this.toggleShowSingleRowElements(range.sri >= 0 && range.sri === range.eri);
+    this.toggleShowMultiRowElements(range.sri >= 0 && range.sri !== range.eri);
   }
   
   getItemByKey(key) {
@@ -101,31 +110,41 @@ export default class ContextMenu {
     return null;
   }
   
-  toggleShowColumnElements(show) {
-    const hide = !show;
-    const columnElements = [
+  toggleShowSingleColumnElements(show) {
+    const elements = [
       this.getItemByKey('delete-column'),
       this.getItemByKey('insert-column'),
     ];
-    for (const element of columnElements) {
-      if (element) {
-        if (hide) {
-          element.hide();
-        }
-        else {
-          element.show();
-        }
-      }
-    }
+    this.toggleShowElements(elements, show);
   }
   
-  toggleShowRowElements(show) {
-    const hide = !show;
-    const rowElements = [
+  toggleShowMultiColumnElements(show) {
+    const elements = [
+      this.getItemByKey('delete-columns'),
+      this.getItemByKey('insert-columns'),
+    ];
+    this.toggleShowElements(elements, show);
+  }
+  
+  toggleShowSingleRowElements(show) {
+    const elements = [
       this.getItemByKey('delete-row'),
       this.getItemByKey('insert-row'),
     ];
-    for (const element of rowElements) {
+    this.toggleShowElements(elements, show);
+  }
+  
+  toggleShowMultiRowElements(show) {
+    const elements = [
+      this.getItemByKey('delete-rows'),
+      this.getItemByKey('insert-rows'),
+    ];
+    this.toggleShowElements(elements, show);
+  }
+  
+  toggleShowElements(elements, show) {
+    const hide = !show;
+    for (const element of elements) {
       if (element) {
         if (hide) {
           element.hide();

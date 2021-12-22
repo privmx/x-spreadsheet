@@ -86,7 +86,13 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
     const text = cell ? cell.text : '';
     this.formulaBar.reset(text);
   }
-  contextMenu.setMode((ri === -1 || ci === -1) ? (ri === -1 ? 'col' : 'row') : 'range');
+  const rng = selector.range;
+  contextMenu.setTargetRange({
+    sci: ci === -1 ? -1 : rng.sci,
+    eci: ci === -1 ? -1 : rng.eci,
+    sri: ri === -1 ? -1 : rng.sri,
+    eri: ri === -1 ? -1 : rng.eri,
+  });
   toolbar.reset();
   table.render();
 }
@@ -562,15 +568,17 @@ function dataSetCellText(text, state = 'finished') {
 }
 
 function insertDeleteRowColumn(type) {
-  const { data } = this;
+  const { data, selector } = this;
+  const nSelectedRows = selector.range.eri - selector.range.sri + 1;
+  const nSelectedCols = selector.range.eci - selector.range.sci + 1;
   if (data.settings.mode === 'read') return;
-  if (type === 'insert-row') {
-    data.insert('row');
-  } else if (type === 'delete-row') {
+  if (type === 'insert-row' || type === 'insert-rows') {
+    data.insert('row', nSelectedRows);
+  } else if (type === 'delete-row' || type === 'delete-rows') {
     data.delete('row');
-  } else if (type === 'insert-column') {
-    data.insert('column');
-  } else if (type === 'delete-column') {
+  } else if (type === 'insert-column' || type === 'insert-columns') {
+    data.insert('column', nSelectedCols);
+  } else if (type === 'delete-column' || type === 'delete-columns') {
     data.delete('column');
   } else if (type === 'delete-cell') {
     data.deleteCell();
