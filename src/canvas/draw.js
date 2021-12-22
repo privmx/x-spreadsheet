@@ -426,38 +426,6 @@ class Draw {
     return [els, newText, texts];
   }
 
-  // parseClickableElements(text) {
-  //   if (!this.clickableElementFinders) {
-  //     return [];
-  //   }
-  //   const els = [];
-  //   let newText = text;
-  //   const texts = [];
-  //   for (const finder of this.clickableElementFinders) {
-  //     els.push(...finder.finder(text));
-  //   }
-  //   let deltaLen = 0;
-  //   for (const el of els) {
-  //     el.start += deltaLen;
-  //     if (el.extraPreSpaces) {
-  //       newText = newText.substr(0, el.start) + ' '.repeat(el.extraPreSpaces) + newText.substr(el.start);
-  //       deltaLen += el.extraPreSpaces;
-  //     }
-  //     if (el.extraPostSpaces) {
-  //       newText = newText.substr(0, el.start + el.length + el.extraPreSpaces) + ' '.repeat(el.extraPostSpaces) + newText.substr(el.start + el.length + el.extraPreSpaces);
-  //       deltaLen += el.extraPostSpaces;
-  //     }
-  //     el.length += el.extraPreSpaces + el.extraPostSpaces;
-  //   }
-    
-  //   let s = newText;
-  //   for (const el of els) {
-      
-  //   }
-    
-  //   return [els, newText, texts];
-  // }
-
   border(style, color) {
     const { ctx } = this;
     ctx.lineWidth = thinLineWidth;
