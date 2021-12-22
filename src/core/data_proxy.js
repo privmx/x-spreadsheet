@@ -897,17 +897,18 @@ export default class DataProxy {
   }
 
   // type: row | column
-  insert(type, n = 1) {
+  // mode: before | after
+  insert(type, mode, n = 1) {
     this.changeData(() => {
-      const { sri, sci } = this.selector.range;
+      const { sri, eri, sci, eci } = this.selector.range;
       const { rows, merges, cols } = this;
       let si = sri;
       if (type === 'row') {
-        rows.insert(sri, n);
+        rows.insert(mode === 'before' ? sri : (eri + 1), n);
       } else if (type === 'column') {
-        rows.insertColumn(sci, n);
+        rows.insertColumn(mode === 'before' ? sci : (eci + 1), n);
         si = sci;
-        cols.len += 1;
+        cols.len += n;
       }
       merges.shift(type, si, n, (ri, ci, rn, cn) => {
         const cell = rows.getCell(ri, ci);

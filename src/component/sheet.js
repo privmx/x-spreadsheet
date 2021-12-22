@@ -572,12 +572,16 @@ function insertDeleteRowColumn(type) {
   const nSelectedRows = selector.range.eri - selector.range.sri + 1;
   const nSelectedCols = selector.range.eci - selector.range.sci + 1;
   if (data.settings.mode === 'read') return;
-  if (type === 'insert-row' || type === 'insert-rows') {
-    data.insert('row', nSelectedRows);
+  if (type === 'insert-row-before' || type === 'insert-rows-before') {
+    data.insert('row', 'before', nSelectedRows);
+  } else if (type === 'insert-row-after' || type === 'insert-rows-after') {
+    data.insert('row', 'after', nSelectedRows);
   } else if (type === 'delete-row' || type === 'delete-rows') {
     data.delete('row');
-  } else if (type === 'insert-column' || type === 'insert-columns') {
-    data.insert('column', nSelectedCols);
+  } else if (type === 'insert-column-before' || type === 'insert-columns-before') {
+    data.insert('column', 'before', nSelectedCols);
+  } else if (type === 'insert-column-after' || type === 'insert-columns-after') {
+    data.insert('column', 'after', nSelectedCols);
   } else if (type === 'delete-column' || type === 'delete-columns') {
     data.delete('column');
   } else if (type === 'delete-cell') {

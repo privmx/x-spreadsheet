@@ -10,10 +10,14 @@ const menuItems = [
   { key: 'paste-value', title: tf('contextmenu.pasteValue'), label: 'Ctrl+Shift+V' },
   { key: 'paste-format', title: tf('contextmenu.pasteFormat'), label: 'Ctrl+Alt+V' },
   { key: 'divider' },
-  { key: 'insert-row', title: tf('contextmenu.insertRow') },
-  { key: 'insert-rows', title: tf('contextmenu.insertRows') },
-  { key: 'insert-column', title: tf('contextmenu.insertColumn') },
-  { key: 'insert-columns', title: tf('contextmenu.insertColumns') },
+  { key: 'insert-row-before', title: tf('contextmenu.insertRowBefore') },
+  { key: 'insert-row-after', title: tf('contextmenu.insertRowAfter') },
+  { key: 'insert-rows-before', title: tf('contextmenu.insertRowsBefore') },
+  { key: 'insert-rows-after', title: tf('contextmenu.insertRowsAfter') },
+  { key: 'insert-column-before', title: tf('contextmenu.insertColumnBefore') },
+  { key: 'insert-column-after', title: tf('contextmenu.insertColumnAfter') },
+  { key: 'insert-columns-before', title: tf('contextmenu.insertColumnsBefore') },
+  { key: 'insert-columns-after', title: tf('contextmenu.insertColumnsAfter') },
   { key: 'divider' },
   { key: 'delete-row', title: tf('contextmenu.deleteRow') },
   { key: 'delete-rows', title: tf('contextmenu.deleteRows') },
@@ -113,7 +117,8 @@ export default class ContextMenu {
   toggleShowSingleColumnElements(show) {
     const elements = [
       this.getItemByKey('delete-column'),
-      this.getItemByKey('insert-column'),
+      this.getItemByKey('insert-column-before'),
+      this.getItemByKey('insert-column-after'),
     ];
     this.toggleShowElements(elements, show);
   }
@@ -121,7 +126,8 @@ export default class ContextMenu {
   toggleShowMultiColumnElements(show) {
     const elements = [
       this.getItemByKey('delete-columns'),
-      this.getItemByKey('insert-columns'),
+      this.getItemByKey('insert-columns-before'),
+      this.getItemByKey('insert-columns-after'),
     ];
     this.toggleShowElements(elements, show);
   }
@@ -129,7 +135,8 @@ export default class ContextMenu {
   toggleShowSingleRowElements(show) {
     const elements = [
       this.getItemByKey('delete-row'),
-      this.getItemByKey('insert-row'),
+      this.getItemByKey('insert-row-before'),
+      this.getItemByKey('insert-row-after'),
     ];
     this.toggleShowElements(elements, show);
   }
@@ -137,7 +144,8 @@ export default class ContextMenu {
   toggleShowMultiRowElements(show) {
     const elements = [
       this.getItemByKey('delete-rows'),
-      this.getItemByKey('insert-rows'),
+      this.getItemByKey('insert-rows-before'),
+      this.getItemByKey('insert-rows-after'),
     ];
     this.toggleShowElements(elements, show);
   }
