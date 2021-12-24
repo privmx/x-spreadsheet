@@ -1210,7 +1210,9 @@ export default class Sheet {
       const avg = sum / numericValues.length;
       
       const formatNumber = num => {
-        let str = num.toFixed(3);
+        const nDigits = 3;
+        const p = Math.pow(10, nDigits);
+        let str = (Math.round(p * num) / p).toFixed(nDigits);
         while (str[str.length - 1] === '.' || str[str.length - 1] == '0') {
           const c = str[str.length - 1];
           str = str.substr(0, str.length - 1);
