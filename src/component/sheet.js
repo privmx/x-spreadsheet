@@ -97,6 +97,23 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
   table.render();
 }
 
+function ensureSelectorInSheet() {
+  const { data, selector } = this;
+  const { sci, eci, sri, eri } = selector.range;
+  const nCols = data.cols.len;
+  const nRows = data.rows.len;
+  
+  const sci2 = Math.min(sci, nCols - 1);
+  const eci2 = Math.min(eci, nCols - 1);
+  const sri2 = Math.min(sri, nRows - 1);
+  const eri2 = Math.min(eri, nRows - 1);
+  
+  if (sci2 !== sci || eci2 !== eci || sri2 !== sri || eri2 !== eri) {
+    this.selectorSet(false, sri2, sci2);
+    this.selectorSet(true, eri2, eci2);
+  }
+}
+
 // multiple: boolean
 // direction: left | right | up | down | row-first | row-last | col-first | col-last
 function selectorMove(multiple, direction) {
@@ -571,6 +588,7 @@ function insertDeleteRowColumn(type) {
   const { data, selector } = this;
   const nSelectedRows = selector.range.eri - selector.range.sri + 1;
   const nSelectedCols = selector.range.eci - selector.range.sci + 1;
+  let needsEnsuringSelectorInSheet = false;
   if (data.settings.mode === 'read') return;
   if (type === 'insert-row-before' || type === 'insert-rows-before') {
     data.insert('row', 'before', nSelectedRows);
@@ -578,12 +596,14 @@ function insertDeleteRowColumn(type) {
     data.insert('row', 'after', nSelectedRows);
   } else if (type === 'delete-row' || type === 'delete-rows') {
     data.delete('row');
+    needsEnsuringSelectorInSheet = true;
   } else if (type === 'insert-column-before' || type === 'insert-columns-before') {
     data.insert('column', 'before', nSelectedCols);
   } else if (type === 'insert-column-after' || type === 'insert-columns-after') {
     data.insert('column', 'after', nSelectedCols);
   } else if (type === 'delete-column' || type === 'delete-columns') {
     data.delete('column');
+    needsEnsuringSelectorInSheet = true;
   } else if (type === 'delete-cell') {
     data.deleteCell();
   } else if (type === 'delete-cell-format') {
@@ -598,6 +618,9 @@ function insertDeleteRowColumn(type) {
     data.setSelectedCellAttr('editable', true);
   } else if (type === 'cell-non-editable') {
     data.setSelectedCellAttr('editable', false);
+  }
+  if (needsEnsuringSelectorInSheet) {
+    ensureSelectorInSheet.call(this);
   }
   clearClipboard.call(this);
   sheetReset.call(this);

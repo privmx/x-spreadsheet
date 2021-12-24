@@ -17,7 +17,7 @@ const infixExprToSuffixExpr = (src) => {
     const c = src.charAt(i);
     if (c !== ' ') {
       if (c == '#' && src.substr(i, 4).toUpperCase() == '#REF') {
-        stack.push('"#REF"');
+        stack.push('"#REF');
         i += 3;
       } else if (c >= 'a' && c <= 'z') {
         subStrs.push(c.toUpperCase());
