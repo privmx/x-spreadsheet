@@ -5,6 +5,13 @@ declare module 'x-data-spreadsheet' {
     icon?: string;
     onClick?: (data: object, sheet: object) => void
   }
+  
+  export interface CellSelectionRange {
+    sci: number;
+    eci: number;
+    sri: number;
+    eri: number;
+  }
   export interface Options {
     mode?: 'edit' | 'read';
     showToolbar?: boolean;
@@ -97,6 +104,7 @@ declare module 'x-data-spreadsheet' {
     };
     contextMenu?: {
       itemsCallback: (items: Array<{ key: string }>) => void;
+      extraItems: Array<{ key: string, title: () => string, callback: (range: CellSelectionRange) => void, isVisibleCallback: (range: CellSelectionRange) => boolean }>;
     };
     clipboard?: {
       setText?: (text: string, event?: ClipboardEvent) => void;

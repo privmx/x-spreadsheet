@@ -43,6 +43,9 @@ function buildMenuItem(item) {
   else {
     el = h('div', `${cssPrefix}-item`)
       .on('click', () => {
+        if (item.callback) {
+          item.callback(this.targetRange);
+        }
         this.itemClick(item.key);
         this.hide();
       })
@@ -55,8 +58,14 @@ function buildMenuItem(item) {
   return el;
 }
 
-function buildMenu() {
+function buildMenu(extraItems) {
   const processedMenuItems = [...menuItems];
+  if (extraItems && extraItems.length > 0) {
+    processedMenuItems.push({ key: 'divider' });
+    for (const item of extraItems) {
+      processedMenuItems.push(item);
+    }
+  }
   if (this.contextMenuOptions && this.contextMenuOptions.itemsCallback) {
     this.contextMenuOptions.itemsCallback(processedMenuItems);
   }
@@ -66,7 +75,7 @@ function buildMenu() {
 export default class ContextMenu {
   constructor(viewFn, isHide = false, isHideForRange = false, contextMenuOptions = null) {
     this.contextMenuOptions = contextMenuOptions;
-    this.menuItems = buildMenu.call(this);
+    this.menuItems = buildMenu.call(this, contextMenuOptions.extraItems);
     this.el = h('div', `${cssPrefix}-contextmenu`)
       .children(...this.menuItems)
       .hide();
@@ -78,6 +87,7 @@ export default class ContextMenu {
   }
 
   setTargetRange(range) {
+    this.targetRange = range;
     const hideEl = this.getItemByKey('hide');
     let mode = 'range';
     if (range.sci < 0) {
@@ -98,6 +108,10 @@ export default class ContextMenu {
       if (hideEl) {
         hideEl.show();
       }
+    }
+    for (const item of this.contextMenuOptions.extraItems) {
+      const show = item.isVisibleCallback(range);
+      this.toggleShowElements([this.getItemByKey(item.key)], show);
     }
     this.toggleShowSingleColumnElements(range.sci >= 0 && range.sci === range.eci);
     this.toggleShowMultiColumnElements(range.sci >= 0 && range.sci !== range.eci);

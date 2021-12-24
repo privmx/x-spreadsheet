@@ -157,6 +157,7 @@ const defaultSettings = {
   },
   contextMenu: {
     itemsCallback: () => {},
+    extraItems: [],
   },
 };
 
