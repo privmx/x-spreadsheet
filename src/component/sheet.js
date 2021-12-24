@@ -19,7 +19,8 @@ import ModalValidation from './modal_validation';
 import SortFilter from './sort_filter';
 import { xtoast } from './message';
 import { cssPrefix } from '../config';
-import { formulas } from '../core/formula';
+import { formulam, formulas } from '../core/formula';
+import _cell from '../core/cell';
 import { xy2expr } from '../core/alphabet';
 
 /**
@@ -79,12 +80,14 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
   if (multiple) {
     selector.setEnd(ri, ci, moving);
     this.trigger('cells-selected', cell, selector.range);
+    this.updateSelectionInfo();
   } else {
     // trigger click event
     selector.set(ri, ci, indexesUpdated);
     this.trigger('cell-selected', cell, ri, ci);
     const text = cell ? cell.text : '';
     this.formulaBar.reset(text);
+    this.updateSelectionInfo();
   }
   const rng = selector.range;
   contextMenu.setTargetRange({
@@ -336,6 +339,7 @@ function sheetReset() {
   selector.reset();
   const cell = data.getSelectedCell();
   this.formulaBar.reset(cell && cell.text ? cell.text : '');
+  this.updateSelectionInfo();
 }
 
 function clearClipboard() {
@@ -383,6 +387,7 @@ function paste(what, evt) {
       this.data.pasteFromText(cdata);
       sheetReset.call(this);
       this.formulaBar.reset(cdata);
+      this.updateSelectionInfo();
     };
     if (cdata instanceof Promise) {
       cdata.then(cdataNew => {
@@ -793,9 +798,11 @@ function sheetInitEvents() {
   editor.change = (state, itext) => {
     if (state === 'finished') {
       this.formulaBar.reset(itext);
+      this.updateSelectionInfo();
     }
     else {
       this.formulaBar.setText(itext);
+      this.updateSelectionInfo();
     }
     dataSetCellText.call(this, itext, state);
   };
@@ -1169,8 +1176,56 @@ export default class Sheet {
       top: rows.height,
     };
   }
+  
   setSelectedCellCustomFormatter(formatter) {
     this.data.setSelectedCellCustomFormatter(formatter);
     sheetReset.call(this);
   }
+  
+  updateSelectionInfo() {
+    const { data } = this;
+    const { rows, selector } = data;
+    const numericValues = [];
+    if (selector.range.sri !== selector.range.eri || selector.range.sci !== selector.range.eci) {
+      for (let ri = selector.range.sri; ri <= selector.range.eri; ++ri) {
+        for (let ci = selector.range.sci; ci <= selector.range.eci; ++ci) {
+          const cell = rows.getCell(ri, ci);
+          if (cell && cell.text && cell.text.length > 0) {
+            let text = cell.text;
+            if (text.startsWith('=')) {
+              text = _cell.render(this.spreadsheet, cell.text || '', formulam, (y, x) => (data.getCellTextOrDefault(x, y)));
+            }
+            if (!isNaN(text)) {
+              numericValues.push(parseFloat(text));
+            }
+          }
+        }
+      }
+    }
+    if (numericValues.length === 0) {
+      this.formulaBar.setSelectionInfoText('');
+    }
+    else {
+      const sum = numericValues.reduce((prev, curr) => prev + curr);
+      const avg = sum / numericValues.length;
+      
+      const formatNumber = num => {
+        let str = num.toFixed(3);
+        while (str[str.length - 1] === '.' || str[str.length - 1] == '0') {
+          const c = str[str.length - 1];
+          str = str.substr(0, str.length - 1);
+          if (c === '.') {
+            break;
+          }
+        }
+        return str;
+      };
+      
+      const sumStr = formatNumber(sum);
+      const avgStr = formatNumber(avg);
+      
+      this.formulaBar.setSelectionInfoText(`Sum: ${sumStr}; Avg: ${avgStr}`);
+    }
+  }
+  
 }

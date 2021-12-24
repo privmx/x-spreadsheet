@@ -25,10 +25,17 @@ export default class FormulaBar {
               onInputCallback(this.text);
             }
           })
+      )
+      .child(
+        this.selectionInfoEl = h('div', `${cssPrefix}-selection-info`)
       );
     if (!this.editable) {
       this.inputEl.el.readOnly = true;
     }
+  }
+  
+  setSelectionInfoText(text) {
+    this.selectionInfoEl.el.textContent = text;
   }
   
   reset(text) {

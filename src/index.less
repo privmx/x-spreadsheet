@@ -717,14 +717,16 @@ body {
 
 .@{css-prefix}-formulabar {
   height: 30px;
+  display: flex;
+  flex-direction: row;
   &.@{css-prefix}-next-to-toolbar {
     position: absolute;
     left: 920px;
     top: 5px;
     right: 5px;
   }
-  &.@{css-prefix}-below-toolbar input {
-    box-sizing: border-box;
+  &.@{css-prefix}-below-toolbar input,
+  &.@{css-prefix}-below-toolbar .@{css-prefix}-selection-info {
     border-bottom: 1px solid #e0e2e4;
   }
   input {
@@ -736,6 +738,17 @@ body {
     outline: none;
     padding: 5px 10px;
     font-size: 13px;
+    flex: 1 1 auto;
+  }
+  .@{css-prefix}-selection-info {
+    flex: 1 1 content;
+    border-left: 1px solid #e0e2e4;
+    background: #f5f6f7;
+    padding: 6px 10px;
+    white-space: nowrap;
+    &:empty {
+      display: none;
+    }
   }
 }
 
