@@ -819,8 +819,24 @@ export default class DataProxy {
     if (rn > 1 || cn > 1) {
       const { sri, sci } = selector.range;
       this.changeData(() => {
+        const values = [];
+        for (let ri = selector.range.sri; ri <= selector.range.eri; ++ri) {
+          for (let ci = selector.range.sci; ci <= selector.range.eci; ++ci) {
+            const cell = rows.getCell(ri, ci);
+            if (cell && cell.text && cell.text.length > 0) {
+              values.push(cell.text);
+            }
+          }
+        }
+        if (values.length > 1) {
+          if (!confirm(t('warning.mergingMultipleValues'))) {
+            return;
+          }
+        }
+        const value = values.length > 0 ? values[0] : "";
         const cell = rows.getCellOrNew(sri, sci);
         cell.merge = [rn - 1, cn - 1];
+        cell.text = value;
         this.merges.add(selector.range);
         // delete merge cells
         this.rows.deleteCells(selector.range);

@@ -96,6 +96,9 @@ export default {
   error: {
     pasteForMergedCell: 'Unable to do this for merged cells',
   },
+  warning: {
+    mergingMultipleValues: 'There are multiple values in the range. Only the first one will be kept.',
+  },
   calendar: {
     weeks: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
