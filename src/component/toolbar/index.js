@@ -28,6 +28,7 @@ import Item from './item';
 import { h } from '../element';
 import { cssPrefix } from '../../config';
 import { bind } from '../event';
+import { t } from '../../locale/locale';
 
 function buildDivider() {
   return h('div', `${cssPrefix}-toolbar-divider`);
@@ -242,7 +243,19 @@ export default class Toolbar {
   createItem(creatorFunc, returnCondition) {
     const el = creatorFunc();
     el.change = (...args) => {
-      this.change(...args);
+      if (args[0] === 'merge' && args[1] === true) {
+        this.checkMergeWarning().then(merge => {
+          if (merge) {
+            this.change(...args);
+          }
+          else {
+            this.mergeEl.setState(false, false);
+          }
+        })
+      }
+      else {
+        this.change(...args);
+      }
     };
     return returnCondition ? el : null;
   }
@@ -262,6 +275,16 @@ export default class Toolbar {
   resetData(data) {
     this.data = data;
     this.reset();
+  }
+  
+  checkMergeWarning() {
+    return Promise.resolve().then(() => {
+      const values = this.data.collectMergeValues();
+      if (values.length > 1) {
+        return window.confirm(t('warning.mergingMultipleValues'));
+      }
+      return true;
+    });
   }
 
   reset() {
