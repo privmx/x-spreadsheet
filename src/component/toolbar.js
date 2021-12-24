@@ -149,7 +149,7 @@ export default class Toolbar {
       buildDivider(),
       buildButton(`${t('toolbar.fillColor')}`).child(this.ddFillColor.el),
       buildButton(`${t('toolbar.border')}`).child(this.ddBorder.el),
-      this.mergeEl = buildButtonWithIcon(`${t('toolbar.merge')}`, 'merge', () => this.callMergeWithWarning()),
+      this.mergeEl = buildButtonWithIcon(`${t('toolbar.merge')}`, 'merge', () => toggleChange.call(this, 'merge')),
       buildDivider(),
       buildButton(`${t('toolbar.align')}`).child(this.ddAlign.el),
       buildButton(`${t('toolbar.valign')}`).child(this.ddVAlign.el),
@@ -188,26 +188,6 @@ export default class Toolbar {
 
   trigger(type) {
     toggleChange.call(this, type);
-  }
-  
-  callMergeWithWarning() {
-    const doMerge = () => {
-      this.toggleChange.call(this, 'merge');
-    };
-    const values = this.data.collectMergeValues();
-    console.log(values);
-    if (values.length > 1) {
-      const confirmResult = window.confirm(t('warning.mergingMultipleValues'));
-      if (confirmResult instanceof Promise) {
-        confirmResult.then(result => {
-          if (result) {
-            doMerge();
-          }
-        });
-      } else if (confirmResult) {
-        doMerge();
-      }
-    }
   }
 
   reset() {
