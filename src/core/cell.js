@@ -261,8 +261,27 @@ const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList)
   return stack[0];
 };
 
+function isFormulaSyntaxValid(str) {
+  const stack = [];
+  for (let i = 0; i < str.length; ++i) {
+    const c = str[i];
+    if (c === '(') {
+      stack.push('(');
+    }
+    else if (c === ')') {
+      if (stack.pop() !== '(') {
+        return false;
+      }
+    }
+  }
+  return stack.length === 0;
+}
+
 const cellRender = (spreadsheet, src, formulaMap, getCellText, cellList = []) => {
   if (src[0] === '=') {
+    if (!isFormulaSyntaxValid(src)) {
+      return '#ERR';
+    }
     const stack = infixExprToSuffixExpr(src.substring(1));
     if (stack.length <= 0) return src;
     return evalSuffixExpr(
