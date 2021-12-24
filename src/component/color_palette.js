@@ -13,6 +13,8 @@ const themeColors = [
 
 const standardColors = ['#c00000', '#fe0000', '#fdc101', '#ffff01', '#93d051', '#00b04e', '#01b0f1', '#0170c1', '#012060', '#7030a0'];
 
+export const highlightColors = ['#ffc001', '#445589', '#71ae47', '#7030a0', '#fe0000', '#9cc2e6', '#a00000', '#000000'];
+
 function buildTd(bgcolor) {
   return h('td', '').child(
     h('div', `${cssPrefix}-color-palette-cell`)

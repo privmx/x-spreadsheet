@@ -156,14 +156,18 @@ function setTextareaRange(position) {
   }, 0);
 }
 
-function setText(text, position) {
+function setText(text, position, preventFocus) {
   const { textEl, textlineEl } = this;
   // firefox bug
-  textEl.el.blur();
+  if (!preventFocus) {
+    textEl.el.blur();
+  }
 
   textEl.val(text);
   textlineEl.html(text);
-  setTextareaRange.call(this, position);
+  if (!preventFocus) {
+    setTextareaRange.call(this, position);
+  }
 }
 
 function suggestItemClick(it) {
@@ -228,6 +232,7 @@ export default class Editor {
         this.textlineEl = h('div', 'textline'),
         this.suggest.el,
         this.datepicker.el,
+        this.htmlFormulaOverlay = h('div', `${cssPrefix}-html-formula-overlay`),
       )
       .on('mousemove.stop', () => {})
       .on('mousedown.stop', () => {});
@@ -240,6 +245,7 @@ export default class Editor {
     this.cell = null;
     this.inputText = '';
     this.change = () => {};
+    this.isOn = false;
   }
 
   setFreezeLengths(width, height) {
@@ -248,6 +254,7 @@ export default class Editor {
   }
 
   clear() {
+    this.isOn = false;
     // const { cell } = this;
     // const cellText = (cell && cell.text) || '';
     if (this.inputText !== '') {
@@ -298,6 +305,7 @@ export default class Editor {
   }
 
   setCell(cell, validator, initialText, viaF2) {
+    this.isOn = true;
     // console.log('::', validator);
     const { el, datepicker, suggest } = this;
     el.show();
@@ -323,10 +331,10 @@ export default class Editor {
     }
   }
 
-  setText(text) {
+  setText(text, preventFocus) {
     this.inputText = text;
     // console.log('text>>:', text);
-    setText.call(this, text, text.length);
+    setText.call(this, text, text.length, preventFocus);
     resetTextareaSize.call(this);
   }
   
@@ -449,6 +457,16 @@ export default class Editor {
         this.setCursorPosition(cursorPosition.start, cursorPosition.end);
       }, 0);
     });
+  }
+  
+  setFormulaHtml(formulaHtml) {
+    this.htmlFormulaOverlay.el.innerHTML = formulaHtml;
+    if (formulaHtml) {
+      this.textEl.el.style.color = 'rgba(0, 0, 0, 0)';
+    }
+    else {
+      this.textEl.el.style.color = '';
+    }
   }
   
 }

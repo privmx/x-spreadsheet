@@ -38,6 +38,14 @@ function renderCellBorders(bboxes, translateFunc) {
 }
 */
 
+function getHighlightInfo (spreadsheet, rindex, cindex) {
+  if (spreadsheet.highlightFormulaCells) {
+    const highlightInfo = spreadsheet.highlightFormulaCells.find(coords => coords[0] == cindex && coords[1] == rindex);
+    return highlightInfo;
+  }
+  return null;
+}
+
 export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0) {
   const { sortedRowMap, rows, cols } = data;
   if (rows.isHide(rindex) || cols.isHide(cindex)) return;
@@ -47,22 +55,25 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
   }
 
   const cell = data.getCell(nrindex, cindex);
-  if (cell === null) return;
+  const highlightInfo = getHighlightInfo (spreadsheet, rindex, cindex);
+  if (cell === null && !highlightInfo) return;
   let frozen = false;
-  if ('editable' in cell && cell.editable === false) {
+  if (cell && 'editable' in cell && cell.editable === false) {
     frozen = true;
   }
 
   const style = data.getCellStyleOrDefault(nrindex, cindex);
   // render text
   let cellText = '';
-  if (!data.settings.evalPaused) {
-    cellText = _cell.render(spreadsheet, cell.text || '', formulam, (y, x) => (data.getCellTextOrDefault(x, y)));
-  } else {
-    cellText = cell.text || '';
-  }
-  if (style.customFormatter) {
-    style.customFormatter.prepareCellStyle(cellText, style);
+  if (cell) {
+    if (!data.settings.evalPaused) {
+      cellText = _cell.render(spreadsheet, cell.text || '', formulam, (y, x) => (data.getCellTextOrDefault(x, y)));
+    } else {
+      cellText = cell.text || '';
+    }
+    if (style.customFormatter) {
+      style.customFormatter.prepareCellStyle(cellText, style);
+    }
   }
   const dbox = getDrawBox(data, rindex, cindex, yoffset);
   dbox.bgcolor = style.bgcolor;
@@ -71,6 +82,17 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
     // bboxes.push({ ri: rindex, ci: cindex, box: dbox });
     draw.strokeBorders(dbox);
   }
+  if (highlightInfo) {
+    const borderStyle = ['medium', highlightInfo[2]];
+    dbox.setBorders({
+      top: borderStyle,
+      right: borderStyle,
+      bottom: borderStyle,
+      left: borderStyle,
+    });
+    draw.strokeBorders(dbox);
+  }
+  if (cell === null) return;
   draw.rect(dbox, () => {
     if (style.format) {
       // console.log(data.formatm, '>>', cell.format);

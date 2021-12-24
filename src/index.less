@@ -427,6 +427,15 @@ body {
       word-wrap: break-word;
       line-height: 22px;
       margin: 0;
+      caret-color: #000;
+    }
+    
+    .@{css-prefix}-html-formula-overlay {
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      pointer-events: none;
+      font: 400 13px Arial, 'Lato', 'Source Sans Pro', Roboto, Helvetica, sans-serif;
     }
 
     .textline {
@@ -719,6 +728,7 @@ body {
   height: 30px;
   display: flex;
   flex-direction: row;
+  position: relative;
   &.@{css-prefix}-next-to-toolbar {
     position: absolute;
     left: 920px;
@@ -739,6 +749,14 @@ body {
     padding: 5px 10px;
     font-size: 13px;
     flex: 1 1 auto;
+    caret-color: #000;
+  }
+  .@{css-prefix}-html-formula-overlay {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    padding: 5px 10px;
+    pointer-events: none;
   }
   .@{css-prefix}-selection-info {
     flex: 1 1 content;

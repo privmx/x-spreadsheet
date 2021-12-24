@@ -21,7 +21,8 @@ import { xtoast } from './message';
 import { cssPrefix } from '../config';
 import { formulam, formulas } from '../core/formula';
 import _cell from '../core/cell';
-import { xy2expr } from '../core/alphabet';
+import { xy2expr, expr2xy } from '../core/alphabet';
+import { highlightColors } from "./color_palette";
 
 /**
  * @desc throttle fn
@@ -535,6 +536,7 @@ function editorSet(initialText, viaF2) {
   editorSetOffset.call(this);
   editor.setCell(data.getSelectedCell(), data.getSelectedValidator(), initialText, viaF2);
   clearClipboard.call(this);
+  this.updateHighlightedFormulaReferences();
 }
 
 function verticalScrollbarMove(distance) {
@@ -742,6 +744,8 @@ function sheetInitEvents() {
           setTimeout(() => {
             this.editor.setCursorPosition(editorCursorPos[0] + rangeText.length);
           }, 0);
+          this.formulaBar.setText(editor.inputText);
+          this.updateHighlightedFormulaReferences();
         };
         document.addEventListener('mouseup', overlayerMouseup);
       }
@@ -805,6 +809,7 @@ function sheetInitEvents() {
       this.updateSelectionInfo();
     }
     dataSetCellText.call(this, itext, state);
+    this.updateHighlightedFormulaReferences();
   };
   // modal validation
   modalValidation.change = (action, ...args) => {
@@ -1013,6 +1018,7 @@ function sheetInitEvents() {
         const initialText = selectedCell ? selectedCell.text : '';
         dataSetCellText.call(this, evt.key, 'input');
         editorSet.call(this, initialText);
+        this.formulaBar.setText(editor.inputText);
       } else if (keyCode === 113) {
         // F2
         editorSet.call(this, null, true);
@@ -1032,7 +1038,8 @@ export default class Sheet {
     this.formulaBar = new FormulaBar(data.settings.mode !== 'read', formulaBar, value => {
       dataSetCellText.call(this, value, 'finished');
       if (this.editor.cell) {
-        this.editor.setText(value);
+        this.editor.setText(value, true);
+        this.updateHighlightedFormulaReferences();
       }
     });
     this.print = new Print(data, spreadsheet);
@@ -1228,6 +1235,50 @@ export default class Sheet {
       
       this.formulaBar.setSelectionInfoText(`Sum: ${sumStr}; Avg: ${avgStr}`);
     }
+  }
+  
+  updateHighlightedFormulaReferences() {
+    const { editor, formulaBar } = this;
+    let highlight = !!editor.isOn && editor.inputText && editor.inputText[0] === '=';
+    if (highlight) {
+      const matches = [...editor.inputText.matchAll(/([a-zA-Z]{1,3}\d+:[a-zA-Z]{1,3}\d+|[a-zA-Z]{1,3}\d+)/g)];
+      let nextColorIndex = 0;
+      const cells = [];
+      let formulaHtml = editor.inputText;
+      let deltaPos = 0;
+      matches.forEach(match => {
+        const str = match[0];
+        const color = highlightColors[nextColorIndex];
+        nextColorIndex = (nextColorIndex + 1) % highlightColors.length;
+        if (str.includes(':')) {
+          const [start, end] = str.split(':').map(expr => expr2xy(expr));
+          for (let x = start[0]; x <= end[0]; ++x) {
+            for (let y = start[1]; y <= end[1]; ++y) {
+              cells.push([x, y, color]);
+            }
+          }
+        }
+        else {
+          cells.push([...expr2xy(str), color]);
+        }
+        
+        const prefix = formulaHtml.substring(0, match.index + deltaPos);
+        const suffix = formulaHtml.substring(match.index + str.length + deltaPos);
+        const prevLength = formulaHtml.length;
+        formulaHtml = `${prefix}<span style="color:${color};">${str}</span>${suffix}`;
+        const newLength = formulaHtml.length;
+        deltaPos += newLength - prevLength;
+      });
+      this.spreadsheet.highlightFormulaCells = cells;
+      editor.setFormulaHtml(formulaHtml);
+      formulaBar.setFormulaHtml(formulaHtml);
+    }
+    else {
+      this.spreadsheet.highlightFormulaCells = undefined;
+      editor.setFormulaHtml("");
+      formulaBar.setFormulaHtml("");
+    }
+    this.table.render();
   }
   
 }

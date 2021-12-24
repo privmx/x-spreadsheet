@@ -28,6 +28,9 @@ export default class FormulaBar {
       )
       .child(
         this.selectionInfoEl = h('div', `${cssPrefix}-selection-info`)
+      )
+      .child(
+        this.htmlFormulaOverlay = h('div', `${cssPrefix}-html-formula-overlay`)
       );
     if (!this.editable) {
       this.inputEl.el.readOnly = true;
@@ -47,6 +50,16 @@ export default class FormulaBar {
   setText(text) {
     this.text = text;
     this.inputEl.val(text);
+  }
+  
+  setFormulaHtml(formulaHtml) {
+    this.htmlFormulaOverlay.el.innerHTML = formulaHtml;
+    if (formulaHtml) {
+      this.inputEl.el.style.color = 'rgba(0, 0, 0, 0)';
+    }
+    else {
+      this.inputEl.el.style.color = '';
+    }
   }
   
 }
