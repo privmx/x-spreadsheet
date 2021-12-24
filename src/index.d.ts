@@ -237,6 +237,13 @@ declare module 'x-data-spreadsheet' {
       sheetIndex: number
     ): CellStyle;
     /**
+     * set selected cell custom formatter
+     * @param formatter
+     */
+     setSelectedCellCustomFormatter(
+       formatter: (value: string | number) => string | number
+    );
+    /**
      * get/set cell text
      * @param rowIndex
      * @param colIndex

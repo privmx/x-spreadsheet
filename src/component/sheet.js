@@ -1146,4 +1146,8 @@ export default class Sheet {
       top: rows.height,
     };
   }
+  setSelectedCellCustomFormatter(formatter) {
+    this.data.setSelectedCellCustomFormatter(formatter);
+    sheetReset.call(this);
+  }
 }

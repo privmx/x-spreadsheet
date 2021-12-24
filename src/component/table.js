@@ -73,6 +73,9 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
       // console.log(data.formatm, '>>', cell.format);
       cellText = formatm[style.format].render(cellText);
     }
+    if (style.customFormatter) {
+      cellText = style.customFormatter(cellText);
+    }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
     // console.log('style:', style);

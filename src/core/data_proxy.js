@@ -651,7 +651,8 @@ export default class DataProxy {
           } else if (property === 'strike' || property === 'textwrap'
             || property === 'underline'
             || property === 'align' || property === 'valign'
-            || property === 'color' || property === 'bgcolor') {
+            || property === 'color' || property === 'bgcolor'
+            || property == 'customFormatter') {
             cstyle[property] = value;
             cell.style = this.addStyle(cstyle);
           } else {
@@ -1043,6 +1044,10 @@ export default class DataProxy {
   getSelectedCellStyle() {
     const { ri, ci } = this.selector;
     return this.getCellStyleOrDefault(ri, ci);
+  }
+  
+  setSelectedCellCustomFormatter(formatter) {
+    this.setSelectedCellAttr('customFormatter', formatter);
   }
 
   // state: input | finished
