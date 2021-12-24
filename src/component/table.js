@@ -54,6 +54,13 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
   }
 
   const style = data.getCellStyleOrDefault(nrindex, cindex);
+  // render text
+  let cellText = '';
+  if (!data.settings.evalPaused) {
+    cellText = _cell.render(spreadsheet, cell.text || '', formulam, (y, x) => (data.getCellTextOrDefault(x, y)));
+  } else {
+    cellText = cell.text || '';
+  }
   if (style.customFormatter) {
     style.customFormatter.prepareCellStyle(cellText, style);
   }
@@ -65,13 +72,6 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
     draw.strokeBorders(dbox);
   }
   draw.rect(dbox, () => {
-    // render text
-    let cellText = '';
-    if (!data.settings.evalPaused) {
-      cellText = _cell.render(spreadsheet, cell.text || '', formulam, (y, x) => (data.getCellTextOrDefault(x, y)));
-    } else {
-      cellText = cell.text || '';
-    }
     if (style.format) {
       // console.log(data.formatm, '>>', cell.format);
       cellText = formatm[style.format].render(cellText);
