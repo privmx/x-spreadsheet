@@ -191,6 +191,12 @@ declare module 'x-data-spreadsheet' {
     [index: number]: SheetData;
   }
 
+  export interface CustomFormatter {
+    prepareCellStyle: (cellText: string, cellStyle: CellStyle) => void,
+    formatCellText: (cellText: string) => string,
+    param: any,
+  }
+  
   export interface CellStyle {
     align?: 'left' | 'center' | 'right';
     valign?: 'top' | 'middle' | 'bottom';
@@ -206,6 +212,7 @@ declare module 'x-data-spreadsheet' {
       bottom?: string[];
       left?: string[];
     };
+    customFormatter?: CustomFormatter;
   }
   export interface Editor {}
   export interface Element {}
@@ -241,11 +248,7 @@ declare module 'x-data-spreadsheet' {
      * @param formatter
      */
      setSelectedCellCustomFormatter(
-       formatter: {
-         prepareCellStyle: (cellText: string, cellStyle: CellStyle) => void,
-         formatCellText: (cellText: string) => string,
-         param: any,
-       }
+       formatter: CustomFormatter
     );
     /**
      * get/set cell text
