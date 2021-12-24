@@ -79,7 +79,7 @@ function keydownEventHandler(evt) {
     }, 0);
   }
   if (keyCode !== 13 && keyCode !== 9) evt.stopPropagation();
-  if (keyCode === 13 && altKey) {
+  if (keyCode === 13 && shiftKey) {
     insertText.call(this, evt, '\n');
     evt.stopPropagation();
   }

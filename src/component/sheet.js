@@ -843,7 +843,7 @@ function sheetInitEvents() {
     if (!this.focusing) return;
     const keyCode = evt.keyCode || evt.which;
     const {
-      key, ctrlKey, shiftKey, metaKey,
+      key, altKey, ctrlKey, shiftKey, metaKey,
     } = evt;
     // console.log('keydown.evt: ', keyCode);
     if (ctrlKey || metaKey) {
@@ -959,7 +959,7 @@ function sheetInitEvents() {
           editor.clear();
           // shift + enter => move up
           // enter => move down
-          selectorMove.call(this, false, shiftKey ? 'up' : 'down');
+          selectorMove.call(this, false, altKey ? 'up' : 'down');
           evt.preventDefault();
           break;
         case 8: // backspace
