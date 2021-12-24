@@ -11,6 +11,10 @@ function npx(px) {
   return parseInt(px * dpr(), 10);
 }
 
+function revNpx(px) {
+  return px / dpr();
+}
+
 function npxLine(px) {
   const n = npx(px);
   return n > 0 ? n - 0.5 : 0.5;
@@ -265,7 +269,7 @@ class Draw {
       const textWidths = [];
       let totalWidth = 0;
       for (const txt of txts) {
-        const txtWidth = ctx.measureText(txt.text).width;
+        const txtWidth = revNpx(ctx.measureText(txt.text).width);
         textWidths.push(txtWidth);
         totalWidth += txtWidth;
       }
