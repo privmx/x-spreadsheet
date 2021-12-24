@@ -654,7 +654,7 @@ export default class DataProxy {
             || property === 'color' || property === 'bgcolor'
             || property == 'customFormatter') {
             cstyle[property] = value;
-            cell.style = this.addStyle(cstyle);
+            cell.style = this.addStyle(cstyle, true);
           } else {
             cell[property] = value;
           }
@@ -1239,12 +1239,14 @@ export default class DataProxy {
     return this.settings.style;
   }
 
-  addStyle(nstyle) {
+  addStyle(nstyle, force) {
     const { styles } = this;
     // console.log('old.styles:', styles, nstyle);
-    for (let i = 0; i < styles.length; i += 1) {
-      const style = styles[i];
-      if (helper.equals(style, nstyle)) return i;
+    if (!force) {
+      for (let i = 0; i < styles.length; i += 1) {
+        const style = styles[i];
+        if (helper.equals(style, nstyle)) return i;
+      }
     }
     styles.push(nstyle);
     return styles.length - 1;

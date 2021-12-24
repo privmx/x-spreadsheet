@@ -243,7 +243,8 @@ declare module 'x-data-spreadsheet' {
      setSelectedCellCustomFormatter(
        formatter: {
          prepareCellStyle: (cellText: string, cellStyle: CellStyle) => void,
-         formatCellText: (cellText: string) => string
+         formatCellText: (cellText: string) => string,
+         param: any,
        }
     );
     /**
