@@ -54,6 +54,9 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
   }
 
   const style = data.getCellStyleOrDefault(nrindex, cindex);
+  if (style.customFormatter) {
+    style.customFormatter.prepareCellStyle(cellText, style);
+  }
   const dbox = getDrawBox(data, rindex, cindex, yoffset);
   dbox.bgcolor = style.bgcolor;
   if (style.border !== undefined) {
@@ -74,7 +77,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
       cellText = formatm[style.format].render(cellText);
     }
     if (style.customFormatter) {
-      cellText = style.customFormatter(cellText);
+      cellText = style.customFormatter.formatCellText(cellText);
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
