@@ -128,12 +128,12 @@ class Spreadsheet {
     return this.datas[sheetIndex].getCellStyle(ri, ci);
   }
   
-  setSelectedCellCustomFormatter() {
-    this.sheet.setSelectedCellCustomFormatter();
+  setSelectedCellCustomFormatter(formatter) {
+    this.sheet.setSelectedCellCustomFormatter(formatter);
   }
   
-  clearSelectedCellCustomFormatter(formatter) {
-    this.sheet.clearSelectedCellCustomFormatter(formatter);
+  clearSelectedCellCustomFormatter() {
+    this.sheet.clearSelectedCellCustomFormatter();
   }
   
   getSelectedRange(sheetIndex = 0) {
