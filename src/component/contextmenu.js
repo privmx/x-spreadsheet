@@ -234,7 +234,7 @@ export default class ContextMenu {
     }
     this.origElements = this.el.el.querySelectorAll('.x-spreadsheet-item');
     if (this.contextMenuOptions && this.contextMenuOptions.preShowCallback) {
-      this.contextMenuOptions.preShowCallback(el, this.targetRange);
+      this.contextMenuOptions.preShowCallback(el.el, this.targetRange);
     }
     const { width } = el.show().offset();
     const view = this.viewFn();
