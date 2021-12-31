@@ -124,30 +124,30 @@ export default class ContextMenu {
       }
     }
     
-    let prevItemVisible = false;
+    let hasPrevVisibleItem = false;
     for (let i = 0; i < this.menuItems.length; ++i) {
       const item = this.menuItems[i];
       if (item.key === 'divider') {
-        if (!prevItemVisible) {
+        if (!hasPrevVisibleItem) {
           item.hide();
         }
-        prevItemVisible = false;
+        hasPrevVisibleItem = false;
       }
       else {
-        prevItemVisible = !item.isHidden();
+        hasPrevVisibleItem = hasPrevVisibleItem || !item.isHidden();
       }
     }
-    prevItemVisible = false;
+    hasPrevVisibleItem = false;
     for (let i = this.menuItems.left - 1; i > 0; --i) {
       const item = this.menuItems[i]; 
       if (item.key === 'divider') {
-        if (!prevItemVisible) {
+        if (!hasPrevVisibleItem) {
           item.hide();
         }
-        prevItemVisible = false;
+        hasPrevVisibleItem = false;
       }
       else {
-        prevItemVisible = !item.isHidden();
+        hasPrevVisibleItem = hasPrevVisibleItem || !item.isHidden();
       }
     }
   }
