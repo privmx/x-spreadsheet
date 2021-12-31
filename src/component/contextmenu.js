@@ -138,7 +138,7 @@ export default class ContextMenu {
       }
     }
     hasPrevVisibleItem = false;
-    for (let i = this.menuItems.left - 1; i > 0; --i) {
+    for (let i = this.menuItems.length - 1; i > 0; --i) {
       const item = this.menuItems[i]; 
       if (item.key === 'divider') {
         if (!hasPrevVisibleItem) {
