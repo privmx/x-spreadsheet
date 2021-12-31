@@ -228,7 +228,6 @@ export default class ContextMenu {
         el.removeChild(el.children[i]);
       }
       for (let i = 0; i < this.origElements.length; ++i) {
-        console.log(this.origElements[i])
         el.appendChild(this.origElements[i]);
       }
     }
