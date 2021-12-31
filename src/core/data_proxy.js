@@ -160,6 +160,7 @@ const defaultSettings = {
     extraItems: [],
     preShowCallback: () => {},
   },
+  cellCustomFormatterCreator: () => {},
 };
 
 

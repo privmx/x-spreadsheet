@@ -111,6 +111,7 @@ declare module 'x-data-spreadsheet' {
       setText?: (text: string, event?: ClipboardEvent) => void;
       getText?: (event?: ClipboardEvent) => string | Promise<string>;
     };
+    cellCustomFormatterCreator: (cellStyle: CellStyle) => void;
   }
 
   export type CELL_SELECTED = 'cell-selected';

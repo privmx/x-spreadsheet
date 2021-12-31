@@ -72,7 +72,12 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
       cellText = cell.text || '';
     }
     if (style.customFormatter) {
-      style.customFormatter.prepareCellStyle(cellText, style);
+      if (!style.customFormatter.prepareCellStyle && data.settings.cellCustomFormatterCreator) {
+        data.settings.cellCustomFormatterCreator(style.customFormatter.prepareCellStyle);
+      }
+      if (style.customFormatter.prepareCellStyle) {
+        style.customFormatter.prepareCellStyle(cellText, style);
+      }
     }
   }
   const dbox = getDrawBox(data, rindex, cindex, yoffset);
@@ -99,7 +104,12 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
       cellText = formatm[style.format].render(cellText);
     }
     if (style.customFormatter) {
-      cellText = style.customFormatter.formatCellText(cellText);
+      if (!style.customFormatter.formatCellText && data.settings.cellCustomFormatterCreator) {
+        data.settings.cellCustomFormatterCreator(style.customFormatter.formatCellText);
+      }
+      if (style.customFormatter.formatCellText) {
+        cellText = style.customFormatter.formatCellText(cellText);
+      }
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
