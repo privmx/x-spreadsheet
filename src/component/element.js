@@ -265,6 +265,10 @@ class Element {
     this.css('display', 'none');
     return this;
   }
+  
+  isHidden() {
+    return this.css('display') === 'none';
+  }
 }
 
 const h = (tag, className = '') => new Element(tag, className);

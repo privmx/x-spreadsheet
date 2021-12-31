@@ -117,6 +117,39 @@ export default class ContextMenu {
     this.toggleShowMultiColumnElements(range.sci >= 0 && range.sci !== range.eci);
     this.toggleShowSingleRowElements(range.sri >= 0 && range.sri === range.eri);
     this.toggleShowMultiRowElements(range.sri >= 0 && range.sri !== range.eri);
+    
+    for (const item of this.menuItems) {
+      if (item.key === 'divider') {
+        item.show();
+      }
+    }
+    
+    let prevItemVisible = false;
+    for (let i = 0; i < this.menuItems.length; ++i) {
+      const item = this.menuItems[i];
+      if (item.key === 'divider') {
+        if (!prevItemVisible) {
+          item.hide();
+        }
+        prevItemVisible = false;
+      }
+      else {
+        prevItemVisible = !item.isHidden();
+      }
+    }
+    prevItemVisible = false;
+    for (let i = this.menuItems.left - 1; i > 0; --i) {
+      const item = this.menuItems[i]; 
+      if (item.key === 'divider') {
+        if (!prevItemVisible) {
+          item.hide();
+        }
+        prevItemVisible = false;
+      }
+      else {
+        prevItemVisible = !item.isHidden();
+      }
+    }
   }
   
   getItemByKey(key) {
