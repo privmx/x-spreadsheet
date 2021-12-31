@@ -222,6 +222,17 @@ export default class ContextMenu {
     if (this.isHide) return;
     if (this.isHideForRange && this.mode === 'range') return;
     const { el } = this;
+    if (this.origElements) {
+      const el = this.el.el;
+      for (let i = el.children.length - 1; i >= 0; --i) {
+        el.removeChild(el.children[i]);
+      }
+      for (let i = 0; i < this.origElements.length; ++i) {
+        console.log(this.origElements[i])
+        el.appendChild(this.origElements[i]);
+      }
+    }
+    this.origElements = this.el.el.querySelectorAll('.x-spreadsheet-item');
     if (this.contextMenuOptions && this.contextMenuOptions.preShowCallback) {
       this.contextMenuOptions.preShowCallback(el, this.targetRange);
     }
