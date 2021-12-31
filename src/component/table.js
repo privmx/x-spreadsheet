@@ -73,7 +73,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
     }
     if (style.customFormatter) {
       if (!style.customFormatter.prepareCellStyle && data.settings.cellCustomFormatterCreator) {
-        data.settings.cellCustomFormatterCreator(style.customFormatter.prepareCellStyle);
+        data.settings.cellCustomFormatterCreator(style);
       }
       if (style.customFormatter.prepareCellStyle) {
         style.customFormatter.prepareCellStyle(cellText, style);
@@ -105,7 +105,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
     }
     if (style.customFormatter) {
       if (!style.customFormatter.formatCellText && data.settings.cellCustomFormatterCreator) {
-        data.settings.cellCustomFormatterCreator(style.customFormatter.formatCellText);
+        data.settings.cellCustomFormatterCreator(style);
       }
       if (style.customFormatter.formatCellText) {
         cellText = style.customFormatter.formatCellText(cellText);
