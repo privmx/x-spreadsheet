@@ -54,6 +54,7 @@ function buildMenuItem(item) {
         h('div', 'label').child(item.label || ''),
       );
   }
+  el.attr("data-key", item.key);
   el.key = item.key;
   return el;
 }
@@ -221,6 +222,9 @@ export default class ContextMenu {
     if (this.isHide) return;
     if (this.isHideForRange && this.mode === 'range') return;
     const { el } = this;
+    if (this.contextMenuOptions && this.contextMenuOptions.preShowCallback) {
+      this.contextMenuOptions.preShowCallback(el);
+    }
     const { width } = el.show().offset();
     const view = this.viewFn();
     const vhf = view.height / 2;
