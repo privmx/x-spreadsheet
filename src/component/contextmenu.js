@@ -223,7 +223,7 @@ export default class ContextMenu {
     if (this.isHideForRange && this.mode === 'range') return;
     const { el } = this;
     if (this.contextMenuOptions && this.contextMenuOptions.preShowCallback) {
-      this.contextMenuOptions.preShowCallback(el);
+      this.contextMenuOptions.preShowCallback(el, this.targetRange);
     }
     const { width } = el.show().offset();
     const view = this.viewFn();

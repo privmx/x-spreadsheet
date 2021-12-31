@@ -105,7 +105,7 @@ declare module 'x-data-spreadsheet' {
     contextMenu?: {
       itemsCallback: (items: Array<{ key: string }>) => void;
       extraItems: Array<{ key: string, title: () => string, callback: (range: CellSelectionRange) => void, isVisibleCallback: (range: CellSelectionRange) => boolean }>;
-      preShowCallback: (elementsContainer: HTMLElement) => void;
+      preShowCallback: (elementsContainer: HTMLElement, targetRange: { sci: number, eci: number, sri: number, eri: number }) => void;
     };
     clipboard?: {
       setText?: (text: string, event?: ClipboardEvent) => void;
