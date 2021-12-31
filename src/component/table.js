@@ -83,7 +83,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
     draw.strokeBorders(dbox);
   }
   if (highlightInfo) {
-    const borderStyle = ['medium', highlightInfo[2]];
+    const borderStyle = ['thick', highlightInfo[2]];
     dbox.setBorders({
       top: borderStyle,
       right: borderStyle,
