@@ -291,6 +291,11 @@ export default class Toolbar {
     if (this.isHide) return;
     const { data } = this;
     const style = data.getSelectedCellStyle();
+    const cell = data.getSelectedCell();
+    let hAlign = style.align;
+    if (!style.hasAlignSet && cell && cell.text && cell.text.trim().length > 0 && !isNaN(cell.text)) {
+        hAlign = 'right';
+    }
     // console.log('canUndo:', data.canUndo());
     this.undoEl.setState(!data.canUndo());
     this.redoEl.setState(!data.canRedo());
@@ -308,7 +313,7 @@ export default class Toolbar {
     this.strikeEl.setState(style.strike);
     this.textColorEl.setState(style.color);
     this.fillColorEl.setState(style.bgcolor);
-    this.alignEl.setState(style.align);
+    this.alignEl.setState(hAlign);
     this.valignEl.setState(style.valign);
     this.textwrapEl.setState(style.textwrap);
     // console.log('freeze is Active:', data.freezeIsActive());
