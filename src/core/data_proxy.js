@@ -1066,6 +1066,10 @@ export default class DataProxy {
   setSelectedCellCustomFormatter(formatter) {
     this.setSelectedCellAttr('customFormatter', formatter);
   }
+  
+  clearSelectedCellCustomFormatter(formatter) {
+    this.setSelectedCellAttr('customFormatter', undefined);
+  }
 
   // state: input | finished
   setCellText(ri, ci, text, state) {

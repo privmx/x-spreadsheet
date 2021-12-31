@@ -1193,6 +1193,11 @@ export default class Sheet {
     sheetReset.call(this);
   }
   
+  clearSelectedCellCustomFormatter() {
+    this.data.clearSelectedCellCustomFormatter();
+    sheetReset.call(this);
+  }
+  
   updateSelectionInfo() {
     const { data } = this;
     const { rows, selector } = data;

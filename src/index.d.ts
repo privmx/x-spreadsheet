@@ -247,9 +247,13 @@ declare module 'x-data-spreadsheet' {
      * set selected cell custom formatter
      * @param formatter
      */
-     setSelectedCellCustomFormatter(
+    setSelectedCellCustomFormatter(
        formatter: CustomFormatter
     );
+    /**
+     * clear selected cell custom formatter
+     */
+    clearSelectedCellCustomFormatter();
     /**
      * get/set cell text
      * @param rowIndex
