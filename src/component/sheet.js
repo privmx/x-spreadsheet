@@ -73,10 +73,7 @@ function scrollbarMove() {
 
 function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
   if (ri === -1 && ci === -1) return;
-  const {
-    table, selector, toolbar, data,
-    contextMenu,
-  } = this;
+  const { table, selector, toolbar, data } = this;
   const cell = data.getCell(ri, ci);
   if (multiple) {
     selector.setEnd(ri, ci, moving);
@@ -90,13 +87,7 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
     this.formulaBar.reset(text);
     this.updateSelectionInfo();
   }
-  const rng = selector.range;
-  contextMenu.setTargetRange({
-    sci: ci === -1 ? -1 : rng.sci,
-    eci: ci === -1 ? -1 : rng.eci,
-    sri: ri === -1 ? -1 : rng.sri,
-    eri: ri === -1 ? -1 : rng.eri,
-  });
+  this.updateContextMenuTargetRange(ri, ci);
   toolbar.reset();
   table.render();
 }
@@ -465,8 +456,8 @@ function overlayerMousedown(evt) {
   const isColumnHeaderClick = ri < 0;
   const isRowHeaderClick = ci < 0;
   const { sci, eci, sri, eri } = this.selector.range;
-  const isSelectedColumnHeaderClick = isColumnHeaderClick && ci >= sci && ci <= eci;
-  const isSelectedRowHeaderClick = isRowHeaderClick && ri >= sri && ri <= eri;
+  const isSelectedColumnHeaderClick = isColumnHeaderClick && ci >= sci && ci <= eci && sri === 0 && eri === data.rows.len - 1;
+  const isSelectedRowHeaderClick = isRowHeaderClick && ri >= sri && ri <= eri && sci === 0 && eci === data.cols.len - 1;
   const isSelectedHeaderRightClick = (isSelectedColumnHeaderClick || isSelectedRowHeaderClick) && evt.buttons === 2;
   if (!evt.shiftKey && !isSelectedHeaderRightClick) {
     // console.log('selectorSetStart:::');
@@ -711,6 +702,19 @@ function sheetInitEvents() {
       // the left mouse button: mousedown → mouseup → click
       // the right mouse button: mousedown → contenxtmenu → mouseup
       if (evt.buttons === 2) {
+        let { offsetX, offsetY } = evt;
+        const trigger = evt.target.closest('.spreadsheet-trigger');
+        if (trigger) {
+          if (evt.ctrlKey || evt.metaKey) {
+            return;
+          }
+          const rect = this.overlayerEl.el.getBoundingClientRect();
+          offsetX = evt.clientX - rect.x;
+          offsetY = evt.clientY - rect.y;
+        }
+        const cellRect = this.data.getCellRectByXY(offsetX, offsetY);
+        const { ri, ci } = cellRect;
+        this.updateContextMenuTargetRange(ri, ci);
         if (this.data.xyInSelectedRect(evt.offsetX, evt.offsetY)) {
           contextMenu.setPosition(evt.offsetX, evt.offsetY);
         } else {
@@ -1279,6 +1283,17 @@ export default class Sheet {
       formulaBar.setFormulaHtml("");
     }
     this.table.render();
+  }
+
+  updateContextMenuTargetRange(ri, ci) {
+    const { contextMenu, selector } = this;
+    const rng = selector.range;
+    contextMenu.setTargetRange({
+      sci: ci === -1 ? -1 : rng.sci,
+      eci: ci === -1 ? -1 : rng.eci,
+      sri: ri === -1 ? -1 : rng.sri,
+      eri: ri === -1 ? -1 : rng.eri,
+    });
   }
   
 }
