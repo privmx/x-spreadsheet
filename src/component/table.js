@@ -152,7 +152,6 @@ function renderAutofilter(viewRange) {
 
 function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, areaId = 'main', frozenWidth, frozenHeight, scrollX, scrollY) {
   const { draw, data } = this;
-  const isMainArea = areaId == 'main';
   draw.save();
   draw.translate(fw, fh)
     .translate(tx, ty);
@@ -182,8 +181,29 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, areaId = 'main', 
   const rset = new Set();
   draw.save();
   draw.translate(0, -exceptRowTotalHeight);
-  if (isMainArea) {
-      draw.clipRect(-tx + frozenWidth, -ty + frozenHeight, viewRange.w, viewRange.h);
+  if (areaId === 'main') {
+    draw.clipRect(
+      -tx + frozenWidth,
+      -ty + frozenHeight,
+      viewRange.w,
+      viewRange.h
+    );
+  }
+  else if (areaId === 'frozen-left') {
+    draw.clipRect(
+      0,
+      -ty + frozenHeight,
+      viewRange.w,
+      viewRange.h
+    );
+  }
+  else if (areaId === 'frozen-top') {
+    draw.clipRect(
+      -tx + frozenWidth,
+      0,
+      viewRange.w,
+      viewRange.h
+    );
   }
   data.eachMergesInView(viewRange, ({ sri, sci, eri }) => {
     if (!exceptRowSet.has(sri)) {
