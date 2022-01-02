@@ -174,6 +174,11 @@ class Draw {
     this.ctx.restore();
     return this;
   }
+  
+  clipRect(x, y,  w, h) {
+    this.ctx.rect(x, y, w, h);
+    this.ctx.clip();
+  }
 
   beginPath() {
     this.ctx.beginPath();
@@ -222,7 +227,7 @@ class Draw {
     }
     textWrap: text wrapping
   */
-  text(mtxt, box, attr = {}, textWrap = true) {
+  text(mtxt, box, attr = {}, textWrap = true, clipX, clipY) {
     const { ctx } = this;
     const {
       hasAlignSet, align: _align, valign, font, color, strike, underline,
@@ -302,6 +307,9 @@ class Draw {
           elem.style.height = box.height + 'px';
           elem.style.left = box.x + 'px';
           elem.style.top = box.y + 'px';
+          const clipLeft = Math.max(0, clipX - box.x);
+          const clipTop = Math.max(0, clipY - box.y);
+          elem.style.clip = `rect(${clipTop}px, 10000px, 10000px, ${clipLeft}px)`;
           elem2.style.left = Math.floor(tx + dx - box.x) + 'px';
           let dt = 0;
           if (valign == 'top') {

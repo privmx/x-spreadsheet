@@ -46,7 +46,7 @@ function getHighlightInfo (spreadsheet, rindex, cindex) {
   return null;
 }
 
-export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0) {
+export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0, clipX, clipY) {
   const { sortedRowMap, rows, cols } = data;
   if (rows.isHide(rindex) || cols.isHide(cindex)) return;
   let nrindex = rindex;
@@ -55,7 +55,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
   }
 
   const cell = data.getCell(nrindex, cindex);
-  const highlightInfo = getHighlightInfo (spreadsheet, rindex, cindex);
+  const highlightInfo = getHighlightInfo(spreadsheet, rindex, cindex);
   if (cell === null && !highlightInfo) return;
   let frozen = false;
   if (cell && 'editable' in cell && cell.editable === false) {
@@ -122,7 +122,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0)
       color: style.color,
       strike: style.strike,
       underline: style.underline,
-    }, style.textwrap);
+    }, style.textwrap, clipX, clipY);
     // error
     const error = data.validations.getError(rindex, cindex);
     if (error) {
@@ -150,7 +150,7 @@ function renderAutofilter(viewRange) {
   }
 }
 
-function renderContent(spreadsheet, viewRange, fw, fh, tx, ty) {
+function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, isMainArea, frozenWidth, frozenHeight) {
   const { draw, data } = this;
   draw.save();
   draw.translate(fw, fh)
@@ -181,9 +181,12 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty) {
   const rset = new Set();
   draw.save();
   draw.translate(0, -exceptRowTotalHeight);
+  if (isMainArea) {
+      draw.clipRect(-tx + frozenWidth, -ty + frozenHeight, viewRange.w, viewRange.h);
+  }
   data.eachMergesInView(viewRange, ({ sri, sci, eri }) => {
     if (!exceptRowSet.has(sri)) {
-      renderCell(spreadsheet, draw, data, sri, sci);
+      renderCell(spreadsheet, draw, data, sri, sci, 0, frozenWidth - tx, frozenHeight - ty);
     } else if (!rset.has(sri)) {
       rset.add(sri);
       const height = data.rows.sumHeight(sri, eri + 1);
@@ -368,7 +371,7 @@ class Table {
     const { x, y } = data.scroll;
     // 1
     renderContentGrid.call(this, viewRange, fw, fh, tx, ty);
-    renderContent.call(this, this.spreadsheet, viewRange, fw, fh, -x, -y);
+    renderContent.call(this, this.spreadsheet, viewRange, fw, fh, -x, -y, true, tx, ty);
     renderFixedHeaders.call(this, 'all', viewRange, fw, fh, tx, ty);
     renderFixedLeftTopCell.call(this, fw, fh);
     const [fri, fci] = data.freeze;
