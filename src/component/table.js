@@ -46,7 +46,7 @@ function getHighlightInfo (spreadsheet, rindex, cindex) {
   return null;
 }
 
-export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0, clipX, clipY) {
+export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0, clipX, clipY, areaId = 'main', scrollX, scrollY, frozenWidth, frozenHeight) {
   const { sortedRowMap, rows, cols } = data;
   if (rows.isHide(rindex) || cols.isHide(cindex)) return;
   let nrindex = rindex;
@@ -122,7 +122,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
       color: style.color,
       strike: style.strike,
       underline: style.underline,
-    }, style.textwrap, clipX, clipY);
+    }, style.textwrap, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
     // error
     const error = data.validations.getError(rindex, cindex);
     if (error) {
@@ -150,8 +150,9 @@ function renderAutofilter(viewRange) {
   }
 }
 
-function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, isMainArea, frozenWidth, frozenHeight) {
+function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, areaId = 'main', frozenWidth, frozenHeight, scrollX, scrollY) {
   const { draw, data } = this;
+  const isMainArea = areaId == 'main';
   draw.save();
   draw.translate(fw, fh)
     .translate(tx, ty);
@@ -172,7 +173,7 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, isMainArea, froze
   draw.save();
   draw.translate(0, -exceptRowTotalHeight);
   viewRange.each((ri, ci) => {
-    renderCell(spreadsheet, draw, data, ri, ci);
+    renderCell(spreadsheet, draw, data, ri, ci, 0, 0, 0, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
   }, ri => filteredTranslateFunc(ri));
   draw.restore();
 
@@ -186,7 +187,7 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, isMainArea, froze
   }
   data.eachMergesInView(viewRange, ({ sri, sci, eri }) => {
     if (!exceptRowSet.has(sri)) {
-      renderCell(spreadsheet, draw, data, sri, sci, 0, frozenWidth - tx, frozenHeight - ty);
+      renderCell(spreadsheet, draw, data, sri, sci, 0, frozenWidth - tx, frozenHeight - ty, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
     } else if (!rset.has(sri)) {
       rset.add(sri);
       const height = data.rows.sumHeight(sri, eri + 1);
@@ -371,7 +372,7 @@ class Table {
     const { x, y } = data.scroll;
     // 1
     renderContentGrid.call(this, viewRange, fw, fh, tx, ty);
-    renderContent.call(this, this.spreadsheet, viewRange, fw, fh, -x, -y, true, tx, ty);
+    renderContent.call(this, this.spreadsheet, viewRange, fw, fh, -x, -y, 'main', tx, ty, -x, -y);
     renderFixedHeaders.call(this, 'all', viewRange, fw, fh, tx, ty);
     renderFixedLeftTopCell.call(this, fw, fh);
     const [fri, fci] = data.freeze;
@@ -383,7 +384,7 @@ class Table {
         vr.eri = fri - 1;
         vr.h = ty;
         renderContentGrid.call(this, vr, fw, fh, tx, 0);
-        renderContent.call(this, this.spreadsheet, vr, fw, fh, -x, 0);
+        renderContent.call(this, this.spreadsheet, vr, fw, fh, -x, 0, 'frozen-top', tx, ty, -x, -y);
         renderFixedHeaders.call(this, 'top', vr, fw, fh, tx, 0);
       }
       // 3
@@ -394,13 +395,13 @@ class Table {
         vr.w = tx;
         renderContentGrid.call(this, vr, fw, fh, 0, ty);
         renderFixedHeaders.call(this, 'left', vr, fw, fh, 0, ty);
-        renderContent.call(this, this.spreadsheet, vr, fw, fh, 0, -y);
+        renderContent.call(this, this.spreadsheet, vr, fw, fh, 0, -y, 'frozen-left', tx, ty, -x, -y);
       }
       // 4
       const freezeViewRange = data.freezeViewRange();
       renderContentGrid.call(this, freezeViewRange, fw, fh, 0, 0);
       renderFixedHeaders.call(this, 'all', freezeViewRange, fw, fh, 0, 0);
-      renderContent.call(this, this.spreadsheet, freezeViewRange, fw, fh, 0, 0);
+      renderContent.call(this, this.spreadsheet, freezeViewRange, fw, fh, 0, 0, 'frozen-corner', tx, ty, -x, -y);
       // 5
       renderFreezeHighlightLine.call(this, fw, fh, tx, ty);
     }

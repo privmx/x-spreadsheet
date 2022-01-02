@@ -227,7 +227,7 @@ class Draw {
     }
     textWrap: text wrapping
   */
-  text(mtxt, box, attr = {}, textWrap = true, clipX, clipY) {
+  text(mtxt, box, attr = {}, textWrap = true, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight) {
     const { ctx } = this;
     const {
       hasAlignSet, align: _align, valign, font, color, strike, underline,
@@ -305,10 +305,12 @@ class Draw {
           const elem2 = elem.children[0];
           elem.style.width = box.width + 'px';
           elem.style.height = box.height + 'px';
-          elem.style.left = box.x + 'px';
-          elem.style.top = box.y + 'px';
-          const clipLeft = Math.max(0, clipX - box.x);
-          const clipTop = Math.max(0, clipY - box.y);
+          const boxX = box.x - (areaId === 'frozen-left' || areaId === 'frozen-corner' ? scrollX : 0);
+          const boxY = box.y - (areaId === 'frozen-top' || areaId === 'frozen-corner' ? scrollY : 0);
+          elem.style.left = boxX + 'px';
+          elem.style.top = boxY + 'px';
+          const clipLeft = Math.max(0, clipX - box.x - (areaId === 'frozen-left' ? frozenWidth : 0));
+          const clipTop = Math.max(0, clipY - box.y - (areaId === 'frozen-top' ? frozenHeight : 0));
           elem.style.clip = `rect(${clipTop}px, 10000px, 10000px, ${clipLeft}px)`;
           elem2.style.left = Math.floor(tx + dx - box.x) + 'px';
           let dt = 0;
