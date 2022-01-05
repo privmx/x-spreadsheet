@@ -569,7 +569,7 @@ class Draw {
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = bgcolor || '#fff';
-    ctx.rect(npxLine(x + 1), npxLine(y + 1), npx(width - 2), npx(height - 2));
+    ctx.rect(npxLine(x), npxLine(y), npx(width), npx(height));
     ctx.clip();
     ctx.fill();
     dtextcb();
