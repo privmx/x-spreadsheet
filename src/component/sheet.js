@@ -1250,7 +1250,7 @@ export default class Sheet {
     const { editor, formulaBar } = this;
     let highlight = !!editor.isOn && editor.inputText && editor.inputText[0] === '=';
     if (highlight) {
-      const matches = [...editor.inputText.matchAll(/([a-zA-Z]{1,3}\d+:[a-zA-Z]{1,3}\d+|[a-zA-Z]{1,3}\d+)/g)];
+      const matches = [...editor.inputText.matchAll(/\$?([a-zA-Z]{1,3}\$?\d+:\$?[a-zA-Z]{1,3}\$?\d+|\$?[a-zA-Z]{1,3}\$?\d+)/g)];
       let nextColorIndex = 0;
       const cells = [];
       let formulaHtml = editor.inputText;
