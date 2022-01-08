@@ -26,6 +26,9 @@ const menuItems = [
   { key: 'delete-cell-text', title: tf('contextmenu.deleteCellText') },
   { key: 'hide', title: tf('contextmenu.hide') },
   { key: 'divider' },
+  { key: 'reset-row-height', title: tf('contextmenu.resetRowHeight') },
+  { key: 'reset-column-width', title: tf('contextmenu.resetColumnWidth') },
+  { key: 'divider' },
   { key: 'validation', title: tf('contextmenu.validation') },
   { key: 'divider' },
   { key: 'cell-printable', title: tf('contextmenu.cellprintable') },
@@ -118,6 +121,8 @@ export default class ContextMenu {
     this.toggleShowMultiColumnElements(range.sci >= 0 && range.sci !== range.eci);
     this.toggleShowSingleRowElements(range.sri >= 0 && range.sri === range.eri);
     this.toggleShowMultiRowElements(range.sri >= 0 && range.sri !== range.eri);
+    this.toggleShowElements([this.getItemByKey('reset-column-width')], range.sci >= 0);
+    this.toggleShowElements([this.getItemByKey('reset-row-height')], range.sri >= 0);
     
     for (const item of this.menuItems) {
       if (item.key === 'divider') {

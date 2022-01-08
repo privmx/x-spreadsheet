@@ -46,6 +46,8 @@ export default {
     deleteColumns: 'Delete columns',
     deleteCell: 'Delete cell',
     deleteCellText: 'Delete cell text',
+    resetRowHeight: 'Reset height',
+    resetColumnWidth: 'Reset width',
     validation: 'Data validations',
     cellprintable: 'Enable export',
     cellnonprintable: 'Disable export',

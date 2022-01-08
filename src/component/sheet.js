@@ -618,6 +618,14 @@ function insertDeleteRowColumn(type) {
   } else if (type === 'delete-column' || type === 'delete-columns') {
     data.delete('column');
     needsEnsuringSelectorInSheet = true;
+  } else if (type === 'reset-row-height') {
+    for (let ri = selector.range.sri; ri <= selector.range.eri; ++ri) {
+      data.rows.setHeight(ri, 25);
+    }
+  } else if (type === 'reset-column-width') {
+    for (let ci = selector.range.sci; ci <= selector.range.eci; ++ci) {
+      data.cols.setWidth(ci, 100);
+    }
   } else if (type === 'delete-cell') {
     data.deleteCell();
   } else if (type === 'delete-cell-format') {
