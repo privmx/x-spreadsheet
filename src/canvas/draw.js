@@ -561,7 +561,7 @@ class Draw {
     ctx.restore();
   }
 
-  rect(box, dtextcb) {
+  rect(box, dtextcb, addExtraPaddingTop, addExtraPaddingLeft) {
     const { ctx } = this;
     const {
       x, y, width, height, bgcolor,
@@ -569,7 +569,12 @@ class Draw {
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = bgcolor || '#fff';
-    ctx.rect(npxLine(x), npxLine(y), npx(width), npx(height));
+    ctx.rect(
+        npxLine(x + 1) - (addExtraPaddingLeft ? 0 : 0.5),
+        npxLine(y + 1) - (addExtraPaddingTop ? 0 : 0.5),
+        npx(width - 2) + 0 + (addExtraPaddingLeft ? 0 : 1),
+        npx(height - 2) + 0 + (addExtraPaddingTop ? 0 : 1)
+    );
     ctx.clip();
     ctx.fill();
     dtextcb();

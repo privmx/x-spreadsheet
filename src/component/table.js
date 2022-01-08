@@ -46,7 +46,7 @@ function getHighlightInfo (spreadsheet, rindex, cindex) {
   return null;
 }
 
-export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0, clipX, clipY, areaId = 'main', scrollX, scrollY, frozenWidth, frozenHeight) {
+export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0, clipX, clipY, areaId = 'main', scrollX, scrollY, frozenWidth, frozenHeight, renderedBorders) {
   const { sortedRowMap, rows, cols } = data;
   if (rows.isHide(rindex) || cols.isHide(cindex)) return;
   let nrindex = rindex;
@@ -97,42 +97,55 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
     });
     draw.strokeBorders(dbox);
   }
+  renderedBorders[`${rindex}_${cindex}`] = {
+      top: dbox.borderTop ? dbox.borderTop[0] : 'none',
+      right: dbox.borderRight ? dbox.borderRight[0] : 'none',
+      bottom: dbox.borderBottom ? dbox.borderBottom[0] : 'none',
+      left: dbox.borderLeft ? dbox.borderLeft[0] : 'none',
+  };
   if (cell === null) return;
-  draw.rect(dbox, () => {
-    if (style.format) {
-      // console.log(data.formatm, '>>', cell.format);
-      cellText = formatm[style.format].render(cellText);
-    }
-    if (style.customFormatter) {
-      if (!style.customFormatter.formatCellText && data.settings.cellCustomFormatterCreator) {
-        data.settings.cellCustomFormatterCreator(style);
-      }
-      if (style.customFormatter.formatCellText) {
-        cellText = style.customFormatter.formatCellText(cellText);
-      }
-    }
-    const font = Object.assign({}, style.font);
-    font.size = getFontSizePxByPt(font.size);
-    // console.log('style:', style);
-    draw.text(cellText, dbox, {
-      hasAlignSet: style.hasAlignSet,
-      align: style.align,
-      valign: style.valign,
-      font,
-      color: style.color,
-      strike: style.strike,
-      underline: style.underline,
-    }, style.textwrap, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
-    // error
-    const error = data.validations.getError(rindex, cindex);
-    if (error) {
-      // console.log('error:', rindex, cindex, error);
-      draw.error(dbox);
-    }
-    if (frozen) {
-      draw.frozen(dbox);
-    }
-  });
+  const prevBottomBorder = renderedBorders[`${rindex - 1}_${cindex}`] ? renderedBorders[`${rindex - 1}_${cindex}`].bottom : 'none';
+  const prevRightBorder = renderedBorders[`${rindex}_${cindex - 1}`] ? renderedBorders[`${rindex}_${cindex - 1}`].right : 'none';
+  draw.rect(
+    dbox,
+    () => {
+        if (style.format) {
+        // console.log(data.formatm, '>>', cell.format);
+        cellText = formatm[style.format].render(cellText);
+        }
+        if (style.customFormatter) {
+        if (!style.customFormatter.formatCellText && data.settings.cellCustomFormatterCreator) {
+            data.settings.cellCustomFormatterCreator(style);
+        }
+        if (style.customFormatter.formatCellText) {
+            cellText = style.customFormatter.formatCellText(cellText);
+        }
+        }
+        const font = Object.assign({}, style.font);
+        font.size = getFontSizePxByPt(font.size);
+        // console.log('style:', style);
+        draw.text(cellText, dbox, {
+        hasAlignSet: style.hasAlignSet,
+        align: style.align,
+        valign: style.valign,
+        font,
+        color: style.color,
+        strike: style.strike,
+        underline: style.underline,
+        }, style.textwrap, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
+        // error
+        const error = data.validations.getError(rindex, cindex);
+        if (error) {
+        // console.log('error:', rindex, cindex, error);
+        draw.error(dbox);
+        }
+        if (frozen) {
+        draw.frozen(dbox);
+        }
+    },
+    prevBottomBorder === 'thick',
+    prevRightBorder === 'thick',
+  );
 }
 
 function renderAutofilter(viewRange) {
@@ -168,11 +181,12 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, areaId = 'main', 
   };
 
   const exceptRowTotalHeight = data.exceptRowTotalHeight(viewRange.sri, viewRange.eri);
+  const renderedBorders = {};
   // 1 render cell
   draw.save();
   draw.translate(0, -exceptRowTotalHeight);
   viewRange.each((ri, ci) => {
-    renderCell(spreadsheet, draw, data, ri, ci, 0, 0, 0, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
+    renderCell(spreadsheet, draw, data, ri, ci, 0, 0, 0, areaId, scrollX, scrollY, frozenWidth, frozenHeight, renderedBorders);
   }, ri => filteredTranslateFunc(ri));
   draw.restore();
 
@@ -207,7 +221,7 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, areaId = 'main', 
   }
   data.eachMergesInView(viewRange, ({ sri, sci, eri }) => {
     if (!exceptRowSet.has(sri)) {
-      renderCell(spreadsheet, draw, data, sri, sci, 0, frozenWidth - tx, frozenHeight - ty, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
+      renderCell(spreadsheet, draw, data, sri, sci, 0, frozenWidth - tx, frozenHeight - ty, areaId, scrollX, scrollY, frozenWidth, frozenHeight, renderedBorders);
     } else if (!rset.has(sri)) {
       rset.add(sri);
       const height = data.rows.sumHeight(sri, eri + 1);
