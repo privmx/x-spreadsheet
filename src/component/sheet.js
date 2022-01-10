@@ -1325,4 +1325,8 @@ export default class Sheet {
     });
   }
   
+  resizeRow(ri, height) {
+    rowResizerFinished.call(this, { ri }, height);
+  }
+  
 }

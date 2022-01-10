@@ -125,14 +125,18 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
         font.size = getFontSizePxByPt(font.size);
         // console.log('style:', style);
         draw.text(cellText, dbox, {
-        hasAlignSet: style.hasAlignSet,
-        align: style.align,
-        valign: style.valign,
-        font,
-        color: style.color,
-        strike: style.strike,
-        underline: style.underline,
-        }, style.textwrap, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight);
+          hasAlignSet: style.hasAlignSet,
+          align: style.align,
+          valign: style.valign,
+          font,
+          color: style.color,
+          strike: style.strike,
+          underline: style.underline,
+        }, style.textwrap, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight, requiredBoxTotalHeight => {
+          setTimeout(() => {
+            spreadsheet.sheet.resizeRow(rindex, requiredBoxTotalHeight);
+          }, 0);
+        });
         // error
         const error = data.validations.getError(rindex, cindex);
         if (error) {

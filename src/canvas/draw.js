@@ -227,7 +227,7 @@ class Draw {
     }
     textWrap: text wrapping
   */
-  text(mtxt, box, attr = {}, textWrap = true, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight) {
+  text(mtxt, box, attr = {}, textWrap = true, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight, missingHeightCb) {
     const { ctx } = this;
     const {
       hasAlignSet, align: _align, valign, font, color, strike, underline,
@@ -268,6 +268,20 @@ class Draw {
       }
     });
     const txtHeight = (ntxts.length - 1) * (font.size + 2);
+    
+    if (textWrap) {
+        const totalTextHeight = txtHeight + font.size;
+        const boxInnerHeight = box.innerHeight();
+        const boxTotalHeight = box.height;
+        if (totalTextHeight > boxInnerHeight) {
+            const missingBoxHeight = Math.ceil(totalTextHeight - boxInnerHeight);
+            const requiredBoxTotalHeight = boxTotalHeight + missingBoxHeight;
+            if (missingHeightCb) {
+                missingHeightCb(requiredBoxTotalHeight);
+            }
+        }
+    }
+    
     let ty = box.texty(valign, txtHeight);
     ntxts.forEach((txts) => {
       let dx = 0;
