@@ -57,12 +57,7 @@ function keydownEventHandler(evt) {
       }
     }
     else {
-      if (keyCode == 38) {
-        this.setCursorPosition(0);
-      }
-      else if (keyCode == 40) {
-        this.setCursorPosition(this.inputText.length);
-      }
+      evt.stopImmediatePropagation();
     }
     return;
   }
