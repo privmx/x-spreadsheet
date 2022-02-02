@@ -17,7 +17,7 @@ const tableGridStyle = {
 
 function getDrawBox(data, rindex, cindex, yoffset = 0, textWidth = -1) {
   if (textWidth >= 0) {
-    textWidth = revNpx(textWidth + cellPaddingWidth + 1);
+    textWidth = revNpx(textWidth + cellPaddingWidth * 2);
   }
   const {
     left, top, width, height, addedExtraWidth,
