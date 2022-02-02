@@ -1005,15 +1005,20 @@ export default class DataProxy {
     }
   }
 
-  cellRect(ri, ci) {
+  cellRect(ri, ci, allowHorizontalOverflow = false, textWidth = -1) {
     const { rows, cols } = this;
     const left = cols.sumWidth(0, ci);
     const top = rows.sumHeight(0, ri);
     const cell = rows.getCell(ri, ci);
     let width = cols.getWidth(ci);
     let height = rows.getHeight(ri);
+    let isCellMerged = false;
+    let isCellTextAlignedLeft = true;
     if (cell !== null) {
+      const style = this.getCellStyle(ri, ci);
+      isCellTextAlignedLeft = style && style.align ? style.align === 'left' : true;
       if (cell.merge) {
+        isCellMerged = true;
         const [rn, cn] = cell.merge;
         // console.log('cell.merge:', cell.merge);
         if (rn > 0) {
@@ -1028,10 +1033,52 @@ export default class DataProxy {
         }
       }
     }
+    const hasHorizontalOverflow = allowHorizontalOverflow && !isCellMerged && isCellTextAlignedLeft && textWidth >= 0;
+    let extraWidth = 0;
+    if (hasHorizontalOverflow) {
+      const maxHorizontalOverflowExtraColumnsCount = 10;
+      let maxHorizontalOverflow = 0;
+      for (let dci = 1; dci <= maxHorizontalOverflowExtraColumnsCount; ++dci) {
+        const ci2 = ci + dci;
+        const cell2 = rows.getCell(ri, ci2);
+        if (cell2 && !this.isCellEmpty(cell2.text, this.getCellStyle(ri, ci2))) {
+          break;
+        }
+        const width2 = cols.getWidth(ci2);
+        maxHorizontalOverflow += width2;
+      }
+      const maxNeededExtraWidth = Math.max(0, textWidth - width);
+      extraWidth = Math.min(maxHorizontalOverflow, maxNeededExtraWidth);
+      width += extraWidth;
+    }
     // console.log('data:', this.d);
     return {
       left, top, width, height, cell,
+      addedExtraWidth: extraWidth,
     };
+  }
+  
+  isCellEmpty(text, style) {
+    const defaultStyle = this.defaultStyle();
+    if (text && text.length > 0) {
+      return false;
+    }
+    if (!style) {
+      return true;
+    }
+    for (const k in style) {
+      if (k === 'hasAlignSet') continue;
+      let styleVal = style[k];
+      let defaultStyleVal = defaultStyle[k];
+      if (k === 'font') {
+        styleVal = JSON.stringify(styleVal);
+        defaultStyleVal = JSON.stringify(defaultStyleVal);
+      }
+      if (styleVal !== defaultStyleVal) {
+        return false;
+      }
+    }
+    return true;
   }
 
   getCell(ri, ci) {

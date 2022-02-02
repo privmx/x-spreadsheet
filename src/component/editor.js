@@ -241,6 +241,7 @@ export default class Editor {
     this.inputText = '';
     this.change = () => {};
     this.isOn = false;
+    this.onClearActions = [];
   }
 
   setFreezeLengths(width, height) {
@@ -250,6 +251,10 @@ export default class Editor {
 
   clear() {
     this.isOn = false;
+    for (const act of this.onClearActions) {
+        act();
+    }
+    this.onClearActions = [];
     // const { cell } = this;
     // const cellText = (cell && cell.text) || '';
     if (this.inputText !== '') {
@@ -301,6 +306,7 @@ export default class Editor {
 
   setCell(cell, validator, initialText, viaF2) {
     this.isOn = true;
+    this.onClearActions = [];
     // console.log('::', validator);
     const { el, datepicker, suggest } = this;
     el.show();

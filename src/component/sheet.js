@@ -554,11 +554,11 @@ function rowResizerFinished(cRect, distance) {
   const { range } = selector;
   if (range.eri === ri) {
     for (let _ri = range.sri; _ri <= range.eri; ++_ri) {
-      data.rows.setHeight(_ri, distance);
+      data.setRowHeight(_ri, distance);
     }
   }
   else {
-    data.rows.setHeight(ri, distance);
+    data.setRowHeight(ri, distance);
   }
   table.render();
   selector.resetAreaOffset();
@@ -572,11 +572,11 @@ function colResizerFinished(cRect, distance) {
   const { range } = selector;
   if (range.eci === ci) {
     for (let _ci = range.sci; _ci <= range.eci; ++_ci) {
-      data.cols.setWidth(_ci, distance);
+      data.setColWidth(_ci, distance);
     }
   }
   else {
-    data.cols.setWidth(ci, distance);
+      data.setColWidth(ci, distance);
   }
   // console.log('data:', data);
   table.render();
@@ -1039,7 +1039,8 @@ function sheetInitEvents() {
       } else if ((keyCode >= 65 && keyCode <= 90)
         || (keyCode >= 48 && keyCode <= 57)
         || (keyCode >= 96 && keyCode <= 105)
-        || keyCode === 191
+        || (keyCode >= 186 && keyCode <= 192)
+        || (keyCode >= 219 && keyCode <= 222)
         || evt.key === '='
       ) {
         const selectedCell = this.data.getSelectedCell();
@@ -1325,8 +1326,14 @@ export default class Sheet {
     });
   }
   
-  resizeRow(ri, height) {
-    rowResizerFinished.call(this, { ri }, height);
+  resizeRowAfterClearingEditor(ri, height) {
+    const fn = () => { rowResizerFinished.call(this, { ri }, height); };
+    if (this.editor.isOn) {
+      this.editor.onClearActions.push(fn);
+    }
+    else {
+      fn();
+    }
   }
   
 }

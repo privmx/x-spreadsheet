@@ -5,7 +5,7 @@ import { formulam } from '../core/formula';
 import { formatm } from '../core/format';
 
 import {
-  Draw, DrawBox, thinLineWidth, npx,
+  Draw, DrawBox, thinLineWidth, npx, revNpx,
 } from '../canvas/draw';
 // gobal var
 const cellPaddingWidth = 5;
@@ -15,11 +15,14 @@ const tableGridStyle = {
   strokeStyle: '#e6e6e6',
 };
 
-function getDrawBox(data, rindex, cindex, yoffset = 0) {
+function getDrawBox(data, rindex, cindex, yoffset = 0, textWidth = -1) {
+  if (textWidth >= 0) {
+    textWidth = revNpx(textWidth + cellPaddingWidth + 1);
+  }
   const {
-    left, top, width, height,
-  } = data.cellRect(rindex, cindex);
-  return new DrawBox(left, top + yoffset, width, height, cellPaddingWidth);
+    left, top, width, height, addedExtraWidth,
+  } = data.cellRect(rindex, cindex, true, textWidth);
+  return new DrawBox(left, top + yoffset, width, height, cellPaddingWidth, addedExtraWidth);
 }
 /*
 function renderCellBorders(bboxes, translateFunc) {
@@ -38,7 +41,7 @@ function renderCellBorders(bboxes, translateFunc) {
 }
 */
 
-function getHighlightInfo (spreadsheet, rindex, cindex) {
+function getHighlightInfo(spreadsheet, rindex, cindex) {
   if (spreadsheet.highlightFormulaCells) {
     const highlightInfo = spreadsheet.highlightFormulaCells.find(coords => coords[0] == cindex && coords[1] == rindex);
     return highlightInfo;
@@ -80,10 +83,17 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
       }
     }
   }
-  const dbox = getDrawBox(data, rindex, cindex, yoffset);
+  const font = Object.assign({}, style.font);
+  font.size = getFontSizePxByPt(font.size);
+  const dbox = getDrawBox(data, rindex, cindex, yoffset, Math.ceil(draw.getTextWidth(cellText, font)));
   dbox.bgcolor = style.bgcolor;
   if (style.border !== undefined) {
-    dbox.setBorders(style.border);
+    const skipRightBorder = dbox.addedExtraWidth > 0;
+    const styleBorder = Object.assign({}, style.border);
+    if (skipRightBorder) {
+      delete styleBorder.right;
+    }
+    dbox.setBorders(styleBorder);
     // bboxes.push({ ri: rindex, ci: cindex, box: dbox });
     draw.strokeBorders(dbox);
   }
@@ -104,22 +114,23 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
       left: dbox.borderLeft ? dbox.borderLeft[0] : 'none',
   };
   if (cell === null) return;
+  if (data.isCellEmpty(cellText, style)) return;
   const prevBottomBorder = renderedBorders[`${rindex - 1}_${cindex}`] ? renderedBorders[`${rindex - 1}_${cindex}`].bottom : 'none';
   const prevRightBorder = renderedBorders[`${rindex}_${cindex - 1}`] ? renderedBorders[`${rindex}_${cindex - 1}`].right : 'none';
   draw.rect(
     dbox,
     () => {
         if (style.format) {
-        // console.log(data.formatm, '>>', cell.format);
-        cellText = formatm[style.format].render(cellText);
+          // console.log(data.formatm, '>>', cell.format);
+          cellText = formatm[style.format].render(cellText);
         }
         if (style.customFormatter) {
-        if (!style.customFormatter.formatCellText && data.settings.cellCustomFormatterCreator) {
+          if (!style.customFormatter.formatCellText && data.settings.cellCustomFormatterCreator) {
             data.settings.cellCustomFormatterCreator(style);
-        }
-        if (style.customFormatter.formatCellText) {
+          }
+          if (style.customFormatter.formatCellText) {
             cellText = style.customFormatter.formatCellText(cellText);
-        }
+          }
         }
         const font = Object.assign({}, style.font);
         font.size = getFontSizePxByPt(font.size);
@@ -134,17 +145,17 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
           underline: style.underline,
         }, style.textwrap, clipX, clipY, areaId, scrollX, scrollY, frozenWidth, frozenHeight, requiredBoxTotalHeight => {
           setTimeout(() => {
-            spreadsheet.sheet.resizeRow(rindex, requiredBoxTotalHeight);
+            spreadsheet.sheet.resizeRowAfterClearingEditor(rindex, requiredBoxTotalHeight);
           }, 0);
         });
         // error
         const error = data.validations.getError(rindex, cindex);
         if (error) {
         // console.log('error:', rindex, cindex, error);
-        draw.error(dbox);
+          draw.error(dbox);
         }
         if (frozen) {
-        draw.frozen(dbox);
+          draw.frozen(dbox);
         }
     },
     prevBottomBorder === 'thick',
@@ -201,26 +212,26 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, areaId = 'main', 
   draw.translate(0, -exceptRowTotalHeight);
   if (areaId === 'main') {
     draw.clipRect(
-      -tx + frozenWidth,
-      -ty + frozenHeight,
-      viewRange.w,
-      viewRange.h
+      npx(-tx + frozenWidth),
+      npx(-ty + frozenHeight),
+      npx(viewRange.w),
+      npx(viewRange.h)
     );
   }
   else if (areaId === 'frozen-left') {
     draw.clipRect(
-      0,
-      -ty + frozenHeight,
-      viewRange.w,
-      viewRange.h
+      npx(0),
+      npx(-ty + frozenHeight),
+      npx(viewRange.w),
+      npx(viewRange.h)
     );
   }
   else if (areaId === 'frozen-top') {
     draw.clipRect(
-      -tx + frozenWidth,
-      0,
-      viewRange.w,
-      viewRange.h
+      npx(-tx + frozenWidth),
+      npx(0),
+      npx(viewRange.w),
+      npx(viewRange.h)
     );
   }
   data.eachMergesInView(viewRange, ({ sri, sci, eri }) => {

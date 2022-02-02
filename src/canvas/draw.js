@@ -21,12 +21,13 @@ function npxLine(px) {
 }
 
 class DrawBox {
-  constructor(x, y, w, h, padding = 0) {
+  constructor(x, y, w, h, padding = 0, addedExtraWidth = 0) {
     this.x = x;
     this.y = y;
     this.width = w;
     this.height = h;
     this.padding = padding;
+    this.addedExtraWidth = addedExtraWidth;
     this.bgcolor = '#ffffff';
     // border: [width, style, color]
     this.borderTop = null;
@@ -209,6 +210,20 @@ class Draw {
     this.ctx.fillText(text, npx(x), npx(y));
     return this;
   }
+  
+  getTextWidth(text, font = null) {
+    if (font) {
+      this.ctx.save();
+      this.attr({
+        font: `${font.italic ? 'italic' : ''} ${font.bold ? 'bold' : ''} ${npx(font.size)}px ${font.name}`,
+      });
+    }
+    const width = this.ctx.measureText(text).width;
+    if (font) {
+      this.ctx.restore();
+    }
+    return width;
+  }
 
   /*
     txt: render text
@@ -247,17 +262,34 @@ class Draw {
     const ntxts = [];
     txts.forEach((_it) => {
       const [clickable, it, texts] = this.parseClickableElements(_it);
-      const txtWidth = ctx.measureText(it).width;
+      const txtWidth = this.getTextWidth(it);
       if (textWrap && txtWidth > npx(biw)) {
         let textLine = { w: 0, len: 0, start: 0 };
+        let lastSpaceIdx = -1;
+        let wAfterLastSpace = 0;
         for (let i = 0; i < it.length; i += 1) {
           if (textLine.w >= npx(biw)) {
+            if (lastSpaceIdx > -1) {
+              textLine.len = lastSpaceIdx - textLine.start;
+              textLine.w -= wAfterLastSpace;
+            }
             const segments = this.getTextSegments(texts, textLine.start, textLine.len);
             ntxts.push(segments);
+            if (lastSpaceIdx > -1) {
+              i = lastSpaceIdx + 1;
+              lastSpaceIdx = -1;
+              wAfterLastSpace = 0;
+            }
             textLine = { w: 0, len: 0, start: i };
           }
           textLine.len += 1;
-          textLine.w += ctx.measureText(it[i]).width + 1;
+          let cw = this.getTextWidth(it[i]) + 1;
+          textLine.w += cw;
+          wAfterLastSpace += cw;
+          if (it[i] === ' ' || it[i] === '\t') {
+            lastSpaceIdx = i;
+            wAfterLastSpace = 0;
+          }
         }
         if (textLine.len > 0) {
           const segments = this.getTextSegments(texts, textLine.start, textLine.len);
@@ -288,7 +320,7 @@ class Draw {
       const textWidths = [];
       let totalWidth = 0;
       for (const txt of txts) {
-        const txtWidth = revNpx(ctx.measureText(txt.text).width);
+        const txtWidth = revNpx(this.getTextWidth(txt.text));
         textWidths.push(txtWidth);
         totalWidth += txtWidth;
       }
@@ -602,4 +634,5 @@ export {
   DrawBox,
   thinLineWidth,
   npx,
+  revNpx,
 };
