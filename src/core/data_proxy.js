@@ -1033,6 +1033,10 @@ export default class DataProxy {
     if (cell !== null) {
       const style = this.getCellStyle(ri, ci);
       isCellTextAlignedLeft = style && style.align ? style.align === 'left' : true;
+      const isTextWrapOn = style ? !!style.textwrap : false;
+      if (isTextWrapOn) {
+        allowHorizontalOverflow = false;
+      }
       if (cell.merge) {
         isCellMerged = true;
         const [rn, cn] = cell.merge;
