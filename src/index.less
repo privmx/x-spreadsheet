@@ -378,6 +378,11 @@ body {
     border: 2px solid @activeSolidColor;
     background: @activeOverlayColor;
     z-index: 5;
+    .@{css-prefix}-selector-area-first {
+      position: absolute;
+      background: transparent;
+      backdrop-filter: brightness(1.1);
+    }
   }
   .@{css-prefix}-selector-clipboard, .@{css-prefix}-selector-autofill {
     position: absolute;

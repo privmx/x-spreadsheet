@@ -713,6 +713,22 @@ export default class DataProxy {
   getSelectedRect() {
     return this.getRect(this.selector.range);
   }
+  
+  getFirstSelectedCellRect() {
+    const sci = this.selector.ci;
+    const sri = this.selector.ri;
+    const cell = this.getCell(sri, sci);
+    const merge = cell && cell.merge ? cell.merge : [0, 0];
+    const eci = sci + merge[1];
+    const eri = sri + merge[0];
+    const range = {
+      sci: sci,
+      eci: eci,
+      sri: sri,
+      eri: eri,
+    };
+    return this.getRect(range);
+  }
 
   getClipboardRect() {
     const { clipboard } = this;

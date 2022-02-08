@@ -114,7 +114,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
       left: dbox.borderLeft ? dbox.borderLeft[0] : 'none',
   };
   if (cell === null) return;
-  if (data.isCellEmpty(cellText, style)) return;
+  if (data.isCellEmpty(cellText, style) && !cell.merge) return;
   const prevBottomBorder = renderedBorders[`${rindex - 1}_${cindex}`] ? renderedBorders[`${rindex - 1}_${cindex}`].bottom : 'none';
   const prevRightBorder = renderedBorders[`${rindex}_${cindex - 1}`] ? renderedBorders[`${rindex}_${cindex - 1}`].right : 'none';
   draw.rect(

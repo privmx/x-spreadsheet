@@ -11,8 +11,11 @@ class SelectorElement {
     this.autoFocus = autoFocus;
     this.inputChange = () => {};
     this.cornerEl = h('div', `${cssPrefix}-selector-corner`);
+    this.areaElFirst = h('div', `${cssPrefix}-selector-area-first`);
     this.areaEl = h('div', `${cssPrefix}-selector-area`)
-      .child(this.cornerEl).hide();
+      .child(this.cornerEl)
+      .child(this.areaElFirst)
+      .hide();
     this.clipboardEl = h('div', `${cssPrefix}-selector-clipboard`).hide();
     this.autofillEl = h('div', `${cssPrefix}-selector-autofill`).hide();
     this.el = h('div', `${cssPrefix}-selector`)
@@ -40,7 +43,7 @@ class SelectorElement {
     return this;
   }
 
-  setAreaOffset(v) {
+  setAreaOffset(v, vFirst) {
     const {
       left, top, width, height,
     } = v;
@@ -50,6 +53,13 @@ class SelectorElement {
       left: left - 0.8,
       top: top - 0.8,
     };
+    const ofFirst = {
+      width: vFirst.width - selectorHeightBorderWidth + 0.8,
+      height: vFirst.height - selectorHeightBorderWidth + 0.8,
+      left: vFirst.left - left,
+      top: vFirst.top - top,
+    };
+    this.areaElFirst.offset(ofFirst)
     this.areaEl.offset(of).show();
     if (this.useHideInput) {
       this.hideInputDiv.offset(of);
@@ -144,24 +154,24 @@ function calLAreaOffset(offset) {
   };
 }
 
-function setBRAreaOffset(offset) {
+function setBRAreaOffset(offset, offsetFirst) {
   const { br } = this;
-  br.setAreaOffset(calBRAreaOffset.call(this, offset));
+  br.setAreaOffset(calBRAreaOffset.call(this, offset), calBRAreaOffset.call(this, offsetFirst));
 }
 
-function setTLAreaOffset(offset) {
+function setTLAreaOffset(offset, offsetFirst) {
   const { tl } = this;
-  tl.setAreaOffset(offset);
+  tl.setAreaOffset(offset, offsetFirst);
 }
 
-function setTAreaOffset(offset) {
+function setTAreaOffset(offset, offsetFirst) {
   const { t } = this;
-  t.setAreaOffset(calTAreaOffset.call(this, offset));
+  t.setAreaOffset(calTAreaOffset.call(this, offset), calTAreaOffset.call(this, offsetFirst));
 }
 
-function setLAreaOffset(offset) {
+function setLAreaOffset(offset, offsetFirst) {
   const { l } = this;
-  l.setAreaOffset(calLAreaOffset.call(this, offset));
+  l.setAreaOffset(calLAreaOffset.call(this, offset), calLAreaOffset.call(this, offsetFirst));
 }
 
 function setLClipboardOffset(offset) {
@@ -184,11 +194,11 @@ function setTClipboardOffset(offset) {
   t.setClipboardOffset(calTAreaOffset.call(this, offset));
 }
 
-function setAllAreaOffset(offset) {
-  setBRAreaOffset.call(this, offset);
-  setTLAreaOffset.call(this, offset);
-  setTAreaOffset.call(this, offset);
-  setLAreaOffset.call(this, offset);
+function setAllAreaOffset(offset, offsetFirst) {
+  setBRAreaOffset.call(this, offset, offsetFirst);
+  setTLAreaOffset.call(this, offset, offsetFirst);
+  setTAreaOffset.call(this, offset, offsetFirst);
+  setLAreaOffset.call(this, offset, offsetFirst);
 }
 
 function setAllClipboardOffset(offset) {
@@ -263,17 +273,19 @@ export default class Selector {
   resetAreaOffset() {
     // console.log('offset:', offset);
     const offset = this.data.getSelectedRect();
+    const offsetFirst = this.data.getFirstSelectedCellRect();
     const coffset = this.data.getClipboardRect();
-    setAllAreaOffset.call(this, offset);
+    setAllAreaOffset.call(this, offset, offsetFirst);
     setAllClipboardOffset.call(this, coffset);
     this.resetOffset();
   }
 
   resetBRTAreaOffset() {
     const offset = this.data.getSelectedRect();
+    const offsetFirst = this.data.getFirstSelectedCellRect();
     const coffset = this.data.getClipboardRect();
-    setBRAreaOffset.call(this, offset);
-    setTAreaOffset.call(this, offset);
+    setBRAreaOffset.call(this, offset, offsetFirst);
+    setTAreaOffset.call(this, offset, offsetFirst);
     setBRClipboardOffset.call(this, coffset);
     setTClipboardOffset.call(this, coffset);
     this.resetOffset();
@@ -281,15 +293,17 @@ export default class Selector {
 
   resetBRLAreaOffset() {
     const offset = this.data.getSelectedRect();
+    const offsetFirst = this.data.getFirstSelectedCellRect();
     const coffset = this.data.getClipboardRect();
-    setBRAreaOffset.call(this, offset);
-    setLAreaOffset.call(this, offset);
+    setBRAreaOffset.call(this, offset, offsetFirst);
+    setLAreaOffset.call(this, offset, offsetFirst);
     setBRClipboardOffset.call(this, coffset);
     setLClipboardOffset.call(this, coffset);
     this.resetOffset();
   }
 
   set(ri, ci, indexesUpdated = true) {
+    console.log("SET", ri,ci)
     const { data } = this;
     const cellRange = data.calSelectedRangeByStart(ri, ci);
     const { sri, sci } = cellRange;
@@ -317,7 +331,7 @@ export default class Selector {
       this.lastci = ci;
     }
     this.range = data.calSelectedRangeByEnd(ri, ci);
-    setAllAreaOffset.call(this, this.data.getSelectedRect());
+    setAllAreaOffset.call(this, this.data.getSelectedRect(), this.data.getFirstSelectedCellRect());
   }
 
   reset() {
