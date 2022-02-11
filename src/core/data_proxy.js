@@ -1136,18 +1136,26 @@ export default class DataProxy {
     this.setSelectedCellAttr('customFormatter', formatter);
   }
   
-  clearSelectedCellCustomFormatter(formatter) {
+  clearSelectedCellCustomFormatter() {
     this.setSelectedCellAttr('customFormatter', undefined);
   }
 
   // state: input | finished
   setCellText(ri, ci, text, state) {
     const { rows, history, validations } = this;
+    const cell = rows.getCellOrNew(ri, ci);
     if (state === 'finished') {
-      rows.setCellText(ri, ci, '');
-      history.add(this.getData());
+      const origText = typeof(cell._origText) === 'string' ? cell._origText : '';
+      delete cell._origText;
+      rows.setCellText(ri, ci, origText);
+      if (origText !== text) {
+        history.add(this.getData());
+      }
       rows.setCellText(ri, ci, text);
     } else {
+      if (typeof(cell._origText) !== 'string') {
+        cell._origText = cell.text || '';
+      }
       rows.setCellText(ri, ci, text);
       this.change(this.getData());
     }

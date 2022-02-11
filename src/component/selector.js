@@ -303,7 +303,6 @@ export default class Selector {
   }
 
   set(ri, ci, indexesUpdated = true) {
-    console.log("SET", ri,ci)
     const { data } = this;
     const cellRange = data.calSelectedRangeByStart(ri, ci);
     const { sri, sci } = cellRange;
