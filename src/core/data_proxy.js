@@ -560,7 +560,7 @@ export default class DataProxy {
     this.clipboard.clear();
   }
 
-  calSelectedRangeByEnd(ri, ci) {
+  calSelectedRangeByEnd(ri, ci, isHeaderClick = false) {
     const {
       selector, rows, cols, merges,
     } = this;
@@ -576,10 +576,17 @@ export default class DataProxy {
     else [sri, eri] = [nri, cri];
     if (nci > cci) [sci, eci] = [cci, nci];
     else [sci, eci] = [nci, cci];
-    selector.range = merges.union(new CellRange(
-      sri, sci, eri, eci,
-    ));
-    selector.range = merges.union(selector.range);
+    if (isHeaderClick) {
+      selector.range = new CellRange(
+        sri, sci, eri, eci,
+      );
+    }
+    else {
+      selector.range = merges.union(new CellRange(
+        sri, sci, eri, eci,
+      ));
+      selector.range = merges.union(selector.range);
+    }
     // console.log('selector.range:', selector.range);
     return selector.range;
   }

@@ -71,12 +71,12 @@ function scrollbarMove() {
   }
 }
 
-function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
+function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false, isHeaderClick = false) {
   if (ri === -1 && ci === -1) return;
   const { table, selector, toolbar, data } = this;
   const cell = data.getCell(ri, ci);
   if (multiple) {
-    selector.setEnd(ri, ci, moving);
+    selector.setEnd(ri, ci, moving, isHeaderClick);
     this.trigger('cells-selected', cell, selector.range);
     this.updateSelectionInfo();
   } else {
@@ -455,6 +455,7 @@ function overlayerMousedown(evt) {
   // console.log('ri:', ri, ', ci:', ci);
   const isColumnHeaderClick = ri < 0;
   const isRowHeaderClick = ci < 0;
+  const isHeaderClick = isColumnHeaderClick || isRowHeaderClick;
   const { sci, eci, sri, eri } = this.selector.range;
   const isSelectedColumnHeaderClick = isColumnHeaderClick && ci >= sci && ci <= eci && sri === 0 && eri === data.rows.len - 1;
   const isSelectedRowHeaderClick = isRowHeaderClick && ri >= sri && ri <= eri && sci === 0 && eci === data.cols.len - 1;
@@ -500,7 +501,7 @@ function overlayerMousedown(evt) {
   if (!isAutofillEl && evt.buttons === 1) {
     if (evt.shiftKey) {
       // console.log('shiftKey::::');
-      selectorSet.call(this, true, ri, ci);
+      selectorSet.call(this, true, ri, ci, true, false, isHeaderClick);
     }
   }
 }

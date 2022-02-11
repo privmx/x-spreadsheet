@@ -322,14 +322,14 @@ export default class Selector {
     this.el.show();
   }
 
-  setEnd(ri, ci, moving = true) {
+  setEnd(ri, ci, moving = true, isHeaderClick = false) {
     const { data, lastri, lastci } = this;
     if (moving) {
       if (ri === lastri && ci === lastci) return;
       this.lastri = ri;
       this.lastci = ci;
     }
-    this.range = data.calSelectedRangeByEnd(ri, ci);
+    this.range = data.calSelectedRangeByEnd(ri, ci, isHeaderClick);
     setAllAreaOffset.call(this, this.data.getSelectedRect(), this.data.getFirstSelectedCellRect());
   }
 
