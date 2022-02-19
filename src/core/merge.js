@@ -120,11 +120,17 @@ class Merges {
 
   setData(merges) {
     this._ = merges.map(merge => CellRange.valueOf(merge));
+    this.removeBrokenMerges();
     return this;
   }
 
   getData() {
+    this.removeBrokenMerges();
     return this._.map(merge => merge.toString());
+  }
+  
+  removeBrokenMerges() {
+    this._ = this._.filter(it => it.sci !== it.eci || it.sri !== it.eri);
   }
 }
 
