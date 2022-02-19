@@ -38,7 +38,10 @@ export default class Scrollbar {
         .css(this.vertical ? 'width' : 'height', '1px')
         .css(cssKey, `${contentDistance}px`);
     } else {
-      this.el.hide();
+      if (!this.el.isHidden()) {
+        this.move({ left: 0, top: 0 });
+        this.el.hide();
+      }
     }
     return this;
   }
