@@ -989,7 +989,7 @@ export default class DataProxy {
         const cell = rows.getCell(ri, ci);
         cell.merge[0] += rn;
         cell.merge[1] += cn;
-        if (cell.merge[0] === 0 && cell.merge[1] === 0) {
+        if (cell.merge[0] <= 0 && cell.merge[1] <= 0) {
           delete cell.merge;
         }
       });

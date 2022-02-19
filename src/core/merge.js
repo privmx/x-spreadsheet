@@ -55,13 +55,36 @@ class Merges {
 
   // type: row | column
   shift(type, index, n, cbWithin) {
+    const toRm = [];
+    if (n < 0) {
+      this._.forEach(cellRange => {
+        const {
+          sri, sci, eri, eci,
+        } = cellRange;
+        if (toRm.includes(cellRange)) {
+          return;
+        }
+        if (type === 'row') {
+          if (sri >= index && eri <= (index - n - 1)) {
+            toRm.push(cellRange);
+          }
+        } else if (type === 'column') {
+          if (sci >= index && eci <= (index - n - 1)) {
+            toRm.push(cellRange);
+          }
+        }
+      });
+    }
+    this._ = this._.filter(it => !toRm.includes(it));
     this._.forEach((cellRange) => {
       const {
         sri, sci, eri, eci,
       } = cellRange;
       const range = cellRange;
       if (type === 'row') {
-        if (sri >= index) {
+        if (sri === index) {
+          range.toRm = true;
+        } else if (sri > index) {
           range.sri += n;
           range.eri += n;
         } else if (sri < index && index <= eri) {
@@ -69,7 +92,9 @@ class Merges {
           cbWithin(sri, sci, n, 0);
         }
       } else if (type === 'column') {
-        if (sci >= index) {
+        if (sci === index) {
+          range.toRm = true;
+        } else if (sci >= index) {
           range.sci += n;
           range.eci += n;
         } else if (sci < index && index <= eci) {
@@ -78,6 +103,7 @@ class Merges {
         }
       }
     });
+    this._ = this._.filter(it => !it.toRm && (it.sci !== it.eci || it.sri !== it.eri));
   }
 
   move(cellRange, rn, cn) {
