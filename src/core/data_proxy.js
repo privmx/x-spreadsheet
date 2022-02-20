@@ -956,8 +956,10 @@ export default class DataProxy {
       }
       merges.shift(type, si, n, (ri, ci, rn, cn) => {
         const cell = rows.getCell(ri, ci);
-        cell.merge[0] += rn;
-        cell.merge[1] += cn;
+        if (cell && cell.merge) {
+          cell.merge[0] += rn;
+          cell.merge[1] += cn;
+        }
       });
     });
   }
@@ -987,10 +989,12 @@ export default class DataProxy {
       merges.shift(type, si, -size, (ri, ci, rn, cn) => {
         // console.log('ri:', ri, ', ci:', ci, ', rn:', rn, ', cn:', cn);
         const cell = rows.getCell(ri, ci);
-        cell.merge[0] += rn;
-        cell.merge[1] += cn;
-        if (cell.merge[0] <= 0 && cell.merge[1] <= 0) {
-          delete cell.merge;
+        if (cell && cell.merge) {
+          cell.merge[0] += rn;
+          cell.merge[1] += cn;
+          if (cell.merge[0] <= 0 && cell.merge[1] <= 0) {
+            delete cell.merge;
+          }
         }
       });
     });
