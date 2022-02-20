@@ -70,6 +70,7 @@ import { t } from '../locale/locale';
  */
 const defaultSettings = {
   mode: 'edit', // edit | read
+  autoFocus: true,
   view: {
     height: () => document.documentElement.clientHeight,
     width: () => document.documentElement.clientWidth,
