@@ -65,6 +65,12 @@ class Spreadsheet {
       window.addEventListener('keyup', window.xSpreadsheetCtrlKeyListener);
     }
   }
+  
+  focus() {
+    if (this.sheet) {
+      this.sheet.focus();
+    }
+  }
 
   addSheet(name, active = true) {
     const n = name || `sheet${this.sheetIndex}`;

@@ -1141,6 +1141,10 @@ export default class Sheet {
     this.clearClipboard = clearClipboard;
     this.isSelectingCellsForFormula = false;
   }
+  
+  focus() {
+    this.selector.focus();
+  }
 
   on(eventName, func) {
     this.eventMap.on(eventName, func);

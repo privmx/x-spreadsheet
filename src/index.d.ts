@@ -227,6 +227,7 @@ declare module 'x-data-spreadsheet' {
   export default class Spreadsheet {
     constructor(container: string | HTMLElement, opts?: Options);
     on: SpreadsheetEventHandler;
+    focus(): void;
     /**
      * retrieve cell
      * @param rowIndex {number} row index

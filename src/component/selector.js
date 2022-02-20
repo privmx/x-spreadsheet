@@ -70,6 +70,12 @@ class SelectorElement {
       }
     }
   }
+  
+  focus() {
+    if (this.hideInput) {
+      this.hideInput.focus();
+    }
+  }
 
   setClipboardOffset(v) {
     const {
@@ -239,6 +245,10 @@ export default class Selector {
     this.lastci = -1;
 
     startZIndex += 1;
+  }
+  
+  focus() {
+    this.br.focus();
   }
 
   resetData(data) {
