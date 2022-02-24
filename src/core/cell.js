@@ -196,6 +196,11 @@ const evalSubExpr = (subExpr, cellRender) => {
 // formulaMap: {'SUM': {}, ...}
 // cellRender: (x, y) => {}
 const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList) => {
+  for (const cell of cellList) {
+    if (srcStack.includes(cell)) {
+      return '#ERR';
+    }
+  }
   const stack = [];
   // console.log(':::::formulaMap:', formulaMap);
   for (let i = 0; i < srcStack.length; i += 1) {
@@ -263,7 +268,10 @@ const evalSuffixExpr = (spreadsheet, srcStack, formulaMap, cellRender, cellList)
   if (typeof(stack[0]) === 'number' && isNaN(stack[0])) {
     return '#ERR';
   }
-  return stack[0];
+  if (typeof(stack[0]) === 'string' && (stack[0].includes('#ERR') || stack[0].includes('NaN'))) {
+    return '#ERR';
+  }
+  return `${stack[0]}`;
 };
 
 function isFormulaSyntaxValid(str) {
