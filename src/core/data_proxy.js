@@ -11,7 +11,7 @@ import { Rows } from './row';
 import { Cols } from './col';
 import { Validations } from './validation';
 import { CellRange } from './cell_range';
-import { expr2xy, xy2expr } from './alphabet';
+import { expr2xy, xy2expr, expr2expr } from './alphabet';
 import { t } from '../locale/locale';
 
 // private methods
@@ -474,6 +474,15 @@ export default class DataProxy {
 
   copyToSystemClipboard(evt) {
     let copyText = [];
+    let copyObj = {
+      cells: [], // Array<{ ri: number, ci: number, text: string, style: object | null }>
+      srcRange: {
+        sci: this.selector.range.sci,
+        eci: this.selector.range.eci,
+        sri: this.selector.range.sri,
+        eri: this.selector.range.eri,
+      }
+    };
     const {
       sri, eri, sci, eci,
     } = this.selector.range;
@@ -482,16 +491,21 @@ export default class DataProxy {
       const row = [];
       for (let ci = sci; ci <= eci; ci += 1) {
         const cell = this.getCell(ri, ci);
-        row.push((cell && cell.text) || '');
+        const text = (cell && cell.text) || '';
+        const renderedText = text.startsWith('=') ? cell._lastRenderedFormula : text;
+        const style = this.getCellStyle(ri, ci);
+        row.push(renderedText);
+        copyObj.cells.push({ ri, ci, text: text, style: style });
       }
       copyText.push(row);
     }
+    console.log({copyText,copyObj})
 
     // Adding \n and why not adding \r\n is to support online office and client MS office and WPS
     copyText = copyText.map(row => row.join('\t')).join('\n');
 
-    if (this.settings.clipboard && this.settings.clipboard.setText) {
-      this.settings.clipboard.setText(copyText);
+    if (this.settings.clipboard && this.settings.clipboard.setData) {
+      this.settings.clipboard.setData({ text: copyText, json: JSON.stringify(copyObj) });
     }
     else {
       // why used this
@@ -546,6 +560,33 @@ export default class DataProxy {
         rows.paste(lines, selector.range);
       });
     }
+  }
+  
+  pasteFromObj(obj) {
+    const dci = this.selector.range.sci - obj.srcRange.sci;
+    const dri = this.selector.range.sri - obj.srcRange.sri;
+    for (const cellData of obj.cells) {
+      const ci = cellData.ci + dci;
+      const ri = cellData.ri + dri;
+      const cell = this.rows.getCellOrNew(ri, ci);
+      this.rows.setCellText(ri, ci, this.translateFormula(cellData.text, dci, dri));
+      cell.style = cellData.style ? this.addStyle(cellData.style) : undefined;
+    }
+  }
+  
+  translateFormula(text, dci, dri) {
+    if (!text.startsWith('=')) {
+      return text;
+    }
+    text = text.replace(/\$?[a-zA-Z]{1,3}\$?\d+/g, (word) => {
+      if (/^\d+$/.test(word)) return word;
+      const isConstX = /\$[a-zA-Z]{1,3}\$?\d+/.test(word);
+      const isConstY = /\$?[a-zA-Z]{1,3}\$\d+/.test(word);
+      const _dci = isConstX ? 0 : dci;
+      const _dri = isConstY ? 0 : dri;
+      return expr2expr(word, _dci, _dri, () => true, isConstX, isConstY);
+    });
+    return text;
   }
 
   autofill(cellRange, what, error = () => {}) {

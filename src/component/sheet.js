@@ -369,16 +369,37 @@ function paste(what, evt) {
     sheetReset.call(this);
   } else if (evt) {
     let cdata;
-    if (data.settings.clipboard && data.settings.clipboard.getText) {
-      cdata = data.settings.clipboard.getText();
+    if (data.settings.clipboard && data.settings.clipboard.getData) {
+      cdata = data.settings.clipboard.getData();
     }
     else {
       cdata = evt.clipboardData.getData('text/plain');
     }
     const execPaste = () => {
-      this.data.pasteFromText(cdata);
+      if (typeof(cdata) === 'object') {
+        if (cdata.json) {
+          try {
+            const obj = JSON.parse(cdata.json);
+            cdata = obj;
+          }
+          catch {
+            cdata = cdata.text;
+          }
+        }
+        else {
+          cdata = cdata.text;
+        }
+      }
+      if (typeof(cdata) === 'string') {
+        this.data.pasteFromText(cdata);
+      }
+      else {
+        this.data.pasteFromObj(cdata);
+      }
       sheetReset.call(this);
-      this.formulaBar.reset(cdata);
+      const selectedCell = this.data.getSelectedCell();
+      const selectedCellText = selectedCell ? selectedCell.text : '';
+      this.formulaBar.reset(selectedCellText);
       this.updateSelectionInfo();
     };
     if (cdata instanceof Promise) {
@@ -1240,6 +1261,7 @@ export default class Sheet {
             let text = cell.text;
             if (text.startsWith('=')) {
               text = _cell.render(this.spreadsheet, cell.text || '', formulam, (y, x) => (data.getCellTextOrDefault(x, y)));
+              cell._lastRenderedFormula = text;
             }
             if (!isNaN(text)) {
               numericValues.push(parseFloat(text));

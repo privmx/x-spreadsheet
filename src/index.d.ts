@@ -108,8 +108,8 @@ declare module 'x-data-spreadsheet' {
       preShowCallback: (elementsContainer: HTMLElement, targetRange: { sci: number, eci: number, sri: number, eri: number }) => void;
     };
     clipboard?: {
-      setText?: (text: string, event?: ClipboardEvent) => void;
-      getText?: (event?: ClipboardEvent) => string | Promise<string>;
+      setData?: (data: { text: string, json: string }, event?: ClipboardEvent) => void;
+      getData?: (event?: ClipboardEvent) => { text: string, json?: string } | Promise<{ text: string, json?: string }>;
     };
     cellCustomFormatterCreator?: (cellStyle: CellStyle) => void;
   }

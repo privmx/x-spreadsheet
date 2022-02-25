@@ -71,6 +71,7 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
   if (cell) {
     if (!data.settings.evalPaused) {
       cellText = _cell.render(spreadsheet, cell.text || '', formulam, (y, x) => (data.getCellTextOrDefault(x, y)));
+      cell._lastRenderedFormula = cellText;
     } else {
       cellText = cell.text || '';
     }
