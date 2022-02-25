@@ -475,6 +475,7 @@ export default class DataProxy {
   copyToSystemClipboard(evt) {
     let copyText = [];
     let copyObj = {
+      srcType: 'x-spreadsheet',
       cells: [], // Array<{ ri: number, ci: number, text: string, style: object | null }>
       srcRange: {
         sci: this.selector.range.sci,
@@ -499,7 +500,6 @@ export default class DataProxy {
       }
       copyText.push(row);
     }
-    console.log({copyText,copyObj})
 
     // Adding \n and why not adding \r\n is to support online office and client MS office and WPS
     copyText = copyText.map(row => row.join('\t')).join('\n');

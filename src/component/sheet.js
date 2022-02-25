@@ -380,7 +380,12 @@ function paste(what, evt) {
         if (cdata.json) {
           try {
             const obj = JSON.parse(cdata.json);
-            cdata = obj;
+            if (obj.srcType === 'x-spreadsheet') {
+              cdata = obj;
+            }
+            else {
+              cdata = cdata.text;
+            }
           }
           catch {
             cdata = cdata.text;
