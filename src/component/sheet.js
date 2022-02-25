@@ -450,7 +450,10 @@ function overlayerMousedown(evt) {
   const {
     selector, data, table, sortFilter,
   } = this;
-  let { offsetX, offsetY } = evt;
+  let { offsetX, offsetY, shiftKey } = evt;
+  if (this.isSelectingCellsForFormula) {
+    shiftKey = false;
+  }
   const trigger = evt.target.closest('.spreadsheet-trigger');
   if (trigger) {
     if (evt.ctrlKey || evt.metaKey) {
@@ -486,7 +489,7 @@ function overlayerMousedown(evt) {
   const isSelectedColumnHeaderClick = isColumnHeaderClick && ci >= sci && ci <= eci && sri === 0 && eri === data.rows.len - 1;
   const isSelectedRowHeaderClick = isRowHeaderClick && ri >= sri && ri <= eri && sci === 0 && eci === data.cols.len - 1;
   const isSelectedHeaderRightClick = (isSelectedColumnHeaderClick || isSelectedRowHeaderClick) && evt.buttons === 2;
-  if (!evt.shiftKey && !isSelectedHeaderRightClick) {
+  if (!shiftKey && !isSelectedHeaderRightClick) {
     // console.log('selectorSetStart:::');
     if (isAutofillEl) {
       selector.showAutofill(ri, ci);
@@ -510,7 +513,7 @@ function overlayerMousedown(evt) {
       ({ ri, ci } = data.getCellRectByXY(offsetX, offsetY));
       if (isAutofillEl) {
         selector.showAutofill(ri, ci);
-      } else if (e.buttons === 1 && !e.shiftKey) {
+      } else if (e.buttons === 1) {
         selectorSet.call(this, true, ri, ci, true, true);
       }
     }, () => {
@@ -525,7 +528,7 @@ function overlayerMousedown(evt) {
   }
 
   if (!isAutofillEl && evt.buttons === 1) {
-    if (evt.shiftKey) {
+    if (shiftKey) {
       // console.log('shiftKey::::');
       selectorSet.call(this, true, ri, ci, true, false, isHeaderClick);
     }
