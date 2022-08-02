@@ -156,7 +156,7 @@
         };
       }
       const rows = {
-        len: 80,
+        len: 280,
         1: {
           cells: {
             0: { text: 'testingtesttestetst' },
@@ -170,6 +170,11 @@
             2: { text: 'haha', merge: [1, 1] },
           }
         },
+        9: {
+            cells: {
+                5: { text: "adsadsadas", merge: [10, 0] },
+            },
+        },
         8: {
           cells: {
             8: { text: 'border test', style: 0 },
@@ -178,6 +183,26 @@
         17: {
           cells: {
             7: { text: 'ab http://x cd' },
+          },
+        },
+        28: {
+            cells: {
+                5: { text: "qwertyuiopasdfghjklzxcvbnm1234567890", },
+            },
+        },
+        40: {
+          cells: {
+              5: { text: "1", },
+          },
+        },
+        41: {
+          cells: {
+              5: { text: "=2", },
+          },
+        },
+        42: {
+          cells: {
+              5: { text: "=1+sum(F40:F44)", },
           },
         },
       };
@@ -214,7 +239,7 @@
         },
       })
         .loadData([{
-          freeze: 'B3',
+        //   freeze: 'B3',
           styles: [
             {
               bgcolor: '#f4f5f8',
@@ -230,6 +255,7 @@
           ],
           merges: [
             'C3:D4',
+            'F10:F20',
           ],
           cols: {
             len: 10,
@@ -238,25 +264,25 @@
           rows,
         }, { name: 'sheet-test', rows: rows10 }]).change((cdata) => {
           // console.log(cdata);
-          console.log('>>>', xs.getData());
+        //   console.log('>>>', xs.getData());
         });
 
       xs.on('cell-selected', (cell, ri, ci) => {
-          console.log('cell:', cell, ', ri:', ri, ', ci:', ci);
+        //   console.log('cell:', cell, ', ri:', ri, ', ci:', ci);
         }).on('cell-edited', (text, ri, ci) => {
-          console.log('text:', text, ', ri: ', ri, ', ci:', ci);
+        //   console.log('text:', text, ', ri: ', ri, ', ci:', ci);
         }).on('undo-performed', () => {
           console.log('undo-performed');
         }).on('redo-performed', () => {
           console.log('redo-performed');
         });
 
-      setTimeout(() => {
-        // xs.loadData([{ rows }]);
-        xs.cellText(14, 3, 'cell-text').reRender();
-        console.log('cell(8, 8):', xs.cell(8, 8));
-        console.log('cellStyle(8, 8):', xs.cellStyle(8, 8));
-      }, 5000);
+    //   setTimeout(() => {
+    //     // xs.loadData([{ rows }]);
+    //     xs.cellText(14, 3, 'cell-text').reRender();
+    //     console.log('cell(8, 8):', xs.cell(8, 8));
+    //     console.log('cellStyle(8, 8):', xs.cellStyle(8, 8));
+    //   }, 5000);
     }
   </script>
   <!--script type="text/javascript" src="https://unpkg.com/x-data-spreadsheet@1.0.20/dist/locale/zh-cn.js"></script-->

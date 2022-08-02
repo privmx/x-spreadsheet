@@ -2,6 +2,7 @@ body {
   margin: 0;
 }
 .x-spreadsheet {
+  position: relative;
   font-size: 13px;
   line-height: normal;
   user-select: none;
@@ -154,7 +155,7 @@ body {
   z-index: 11;
 }
 .x-spreadsheet-resizer .x-spreadsheet-resizer-hover {
-  background-color: rgba(75, 137, 255, 0.25);
+  background-color: var(--x-spreadsheet-active-hover-color, rgba(75, 137, 255, 0.25));
 }
 .x-spreadsheet-resizer .x-spreadsheet-resizer-line {
   position: absolute;
@@ -163,7 +164,7 @@ body {
   cursor: row-resize;
 }
 .x-spreadsheet-resizer.horizontal .x-spreadsheet-resizer-line {
-  border-bottom: 2px dashed #4b89ff;
+  border-bottom: 2px dashed var(--x-spreadsheet-active-solid-color, #4b89ff);
   left: 0;
   bottom: 0;
 }
@@ -171,7 +172,7 @@ body {
   cursor: col-resize;
 }
 .x-spreadsheet-resizer.vertical .x-spreadsheet-resizer-line {
-  border-right: 2px dashed #4b89ff;
+  border-right: 2px dashed var(--x-spreadsheet-active-solid-color, #4b89ff);
   top: 0;
   right: 0;
 }
@@ -216,6 +217,27 @@ body {
   width: 100%;
   height: 100%;
 }
+.x-spreadsheet-overlayer-clickable-elements-container .x-spreadsheet-overlayer-clickable-elements-inner {
+  position: relative;
+}
+.x-spreadsheet-overlayer-clickable-elements-container .x-spreadsheet-overlayer-clickable-elements-inner > * {
+  position: absolute;
+  overflow: hidden;
+}
+.x-spreadsheet-overlayer-clickable-elements-container .x-spreadsheet-overlayer-clickable-elements-inner > * > * {
+  position: absolute;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+body.x-spreadsheet-has-ctrl-key .x-spreadsheet-overlayer-clickable-elements-container .x-spreadsheet-overlayer-clickable-elements-inner > * > * {
+  cursor: pointer;
+}
+body.x-spreadsheet-no-ctrl-key .x-spreadsheet-overlayer-clickable-elements-container .x-spreadsheet-overlayer-clickable-elements-inner > * > * {
+  cursor: default;
+}
+.x-spreadsheet-overlayer-clickable-elements-container .x-spreadsheet-overlayer-clickable-elements-inner > * > * * {
+  cursor: inherit;
+}
 .x-spreadsheet-editor,
 .x-spreadsheet-selector {
   box-sizing: content-box;
@@ -239,9 +261,14 @@ body {
 }
 .x-spreadsheet-selector .x-spreadsheet-selector-area {
   position: absolute;
-  border: 2px solid #4b89ff;
-  background: rgba(75, 137, 255, 0.1);
+  border: 2px solid var(--x-spreadsheet-active-solid-color, #4b89ff);
+  background: var(--x-spreadsheet-active-overlay-color, rgba(75, 137, 255, 0.1));
   z-index: 5;
+}
+.x-spreadsheet-selector .x-spreadsheet-selector-area .x-spreadsheet-selector-area-first {
+  position: absolute;
+  background: transparent;
+  backdrop-filter: brightness(1.1);
 }
 .x-spreadsheet-selector .x-spreadsheet-selector-clipboard,
 .x-spreadsheet-selector .x-spreadsheet-selector-autofill {
@@ -250,7 +277,7 @@ body {
   z-index: 100;
 }
 .x-spreadsheet-selector .x-spreadsheet-selector-clipboard {
-  border: 2px dashed #4b89ff;
+  border: 2px dashed var(--x-spreadsheet-active-solid-color, #4b89ff);
 }
 .x-spreadsheet-selector .x-spreadsheet-selector-autofill {
   border: 1px dashed rgba(0, 0, 0, 0.45);
@@ -265,7 +292,7 @@ body {
   right: -5px;
   bottom: -5px;
   border: 2px solid #ffffff;
-  background: #4b89ff;
+  background: var(--x-spreadsheet-active-solid-color, #4b89ff);
 }
 .x-spreadsheet-editor {
   z-index: 20;
@@ -273,7 +300,7 @@ body {
 .x-spreadsheet-editor .x-spreadsheet-editor-area {
   position: absolute;
   text-align: left;
-  border: 2px solid #4b89ff;
+  border: 2px solid var(--x-spreadsheet-active-solid-color, #4b89ff);
   line-height: 0;
   z-index: 100;
   pointer-events: auto;
@@ -281,17 +308,24 @@ body {
 .x-spreadsheet-editor .x-spreadsheet-editor-area textarea {
   box-sizing: content-box;
   border: none;
-  padding: 0 3px;
+  padding: 2px 3px 0 4px;
   outline: none;
   resize: none;
   text-align: start;
   overflow-y: hidden;
   font: 400 13px Arial, 'Lato', 'Source Sans Pro', Roboto, Helvetica, sans-serif;
   color: inherit;
-  white-space: normal;
   word-wrap: break-word;
-  line-height: 22px;
+  line-height: 15px;
   margin: 0;
+  caret-color: #000;
+}
+.x-spreadsheet-editor .x-spreadsheet-editor-area .x-spreadsheet-html-formula-overlay {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  pointer-events: none;
+  font: 400 13px Arial, 'Lato', 'Source Sans Pro', Roboto, Helvetica, sans-serif;
 }
 .x-spreadsheet-editor .x-spreadsheet-editor-area .textline {
   overflow: hidden;
@@ -299,6 +333,17 @@ body {
   position: fixed;
   top: 0;
   left: 0;
+}
+.x-spreadsheet-editor .x-spreadsheet-editor-area .x-spreadsheet-chooser-hint {
+  position: absolute;
+  top: -35px;
+  left: 0;
+  background: #fff;
+  border-radius: 3px;
+  padding: 15px 5px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .x-spreadsheet-item {
   user-select: none;
@@ -415,6 +460,7 @@ body {
   text-align: left;
   background: #f5f6f7;
   display: flex;
+  box-sizing: border-box;
 }
 .x-spreadsheet-bottombar {
   position: relative;
@@ -462,6 +508,7 @@ body {
   display: inline-block;
 }
 .x-spreadsheet-toolbar {
+  padding-left: 10px;
   border-bottom: 1px solid #e0e2e4;
 }
 .x-spreadsheet-toolbar .x-spreadsheet-toolbar-btns {
@@ -494,6 +541,9 @@ body {
 .x-spreadsheet-toolbar .x-spreadsheet-toolbar-btn.active {
   background: rgba(0, 0, 0, 0.08);
 }
+.x-spreadsheet-toolbar-btn--font-size .x-spreadsheet-dropdown-title {
+  min-width: 26px;
+}
 .x-spreadsheet-toolbar-divider {
   display: inline-block;
   border-right: 1px solid #e0e2e4;
@@ -501,6 +551,51 @@ body {
   vertical-align: middle;
   height: 18px;
   margin: 12px 3px 0;
+}
+.x-spreadsheet-formulabar {
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+.x-spreadsheet-formulabar.x-spreadsheet-next-to-toolbar {
+  position: absolute;
+  left: 920px;
+  top: 5px;
+  right: 5px;
+}
+.x-spreadsheet-formulabar.x-spreadsheet-below-toolbar input,
+.x-spreadsheet-formulabar.x-spreadsheet-below-toolbar .x-spreadsheet-selection-info {
+  border-bottom: 1px solid #e0e2e4;
+}
+.x-spreadsheet-formulabar input {
+  box-sizing: border-box;
+  display: block;
+  height: 30px;
+  width: 100%;
+  border: 0;
+  outline: none;
+  padding: 5px 10px;
+  font-size: 13px;
+  flex: 1 1 auto;
+  caret-color: #000;
+}
+.x-spreadsheet-formulabar .x-spreadsheet-html-formula-overlay {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  padding: 5px 10px;
+  pointer-events: none;
+}
+.x-spreadsheet-formulabar .x-spreadsheet-selection-info {
+  flex: 1 1 content;
+  border-left: 1px solid #e0e2e4;
+  background: #f5f6f7;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+.x-spreadsheet-formulabar .x-spreadsheet-selection-info:empty {
+  display: none;
 }
 .x-spreadsheet-print {
   position: absolute;
@@ -685,8 +780,8 @@ body {
   box-shadow: inset 0 1px 2px hsla(0, 0%, 4%, 0.06);
 }
 .x-spreadsheet-form-input input:focus {
-  border-color: #4b89ff;
-  box-shadow: inset 0 1px 2px rgba(75, 137, 255, 0.2);
+  border-color: var(--x-spreadsheet-active-solid-color, #4b89ff);
+  box-shadow: inset 0 1px 2px var(--x-spreadsheet-active-focus-color, rgba(75, 137, 255, 0.2));
 }
 .x-spreadsheet-form-select {
   position: relative;

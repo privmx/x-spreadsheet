@@ -407,6 +407,7 @@ export default class DataProxy {
     this.exceptRowSet = new Set();
     this.sortedRowMap = new Map();
     this.unsortedRowMap = new Map();
+    this.randomId = Math.random().toString(36).substr(2);
   }
 
   addValidation(mode, ref, validator) {
@@ -476,6 +477,7 @@ export default class DataProxy {
     let copyText = [];
     let copyObj = {
       srcType: 'x-spreadsheet',
+      srcDataId: this.randomId,
       cells: [], // Array<{ ri: number, ci: number, text: string, style: object | null }>
       srcRange: {
         sci: this.selector.range.sci,

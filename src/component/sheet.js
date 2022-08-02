@@ -365,17 +365,27 @@ function cut(evt) {
 function paste(what, evt) {
   const { data } = this;
   if (data.settings.mode === 'read') return;
-  if (data.paste(what, msg => xtoast('Tip', msg))) {
-    sheetReset.call(this);
-  } else if (evt) {
-    let cdata;
-    if (data.settings.clipboard && data.settings.clipboard.getData) {
-      cdata = data.settings.clipboard.getData();
+  let cdata;
+  if (data.settings.clipboard && data.settings.clipboard.getData) {
+    cdata = data.settings.clipboard.getData();
+  }
+  else {
+    cdata = evt.clipboardData.getData('text/plain');
+  }
+  const execPaste = () => {
+    let canPasteInternal = false;
+    if (cdata && cdata.json) {
+      try {
+        let parsedData = JSON.parse(cdata.json);
+        canPasteInternal = parsedData.srcType === 'x-spreadsheet' && parsedData.srcDataId === data.randomId;
+      } catch {}
     }
-    else {
-      cdata = evt.clipboardData.getData('text/plain');
+    if (!canPasteInternal) {
+      data.clipboard.clear();
     }
-    const execPaste = () => {
+    if (canPasteInternal && data.paste(what, msg => xtoast('Tip', msg))) {
+      sheetReset.call(this);
+    } else if (evt) {
       if (typeof(cdata) === 'object') {
         if (cdata.json) {
           try {
@@ -406,16 +416,16 @@ function paste(what, evt) {
       const selectedCellText = selectedCell ? selectedCell.text : '';
       this.formulaBar.reset(selectedCellText);
       this.updateSelectionInfo();
-    };
-    if (cdata instanceof Promise) {
-      cdata.then(cdataNew => {
-        cdata = cdataNew;
-        execPaste();
-      });
     }
-    else {
+  };
+  if (cdata instanceof Promise) {
+    cdata.then(cdataNew => {
+      cdata = cdataNew;
       execPaste();
-    }
+    });
+  }
+  else {
+    execPaste();
   }
 }
 
