@@ -1109,8 +1109,8 @@ export default class Sheet {
       if (this.editor.cell) {
         this.editor.setText(value, true);
         this.updateHighlightedFormulaReferences();
-        this.trigger('change');
       }
+      this.trigger('change');
     });
     this.print = new Print(data, spreadsheet);
     targetEl.children(this.toolbar.el, this.formulaBar.el, this.el, this.print.el);
