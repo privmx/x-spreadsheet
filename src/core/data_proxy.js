@@ -891,6 +891,12 @@ export default class DataProxy {
         const values = this.collectMergeValues();
         const value = values.length > 0 ? values[0] : "";
         const cell = rows.getCellOrNew(sri, sci);
+        const firstCellStyle = this.getCellStyle(sri, sci);
+        const firstNonEmptyCellStyle = this.getMergeFirstNonEmptyCellStyle();
+        const mergedCellStyle = firstCellStyle ? firstCellStyle : firstNonEmptyCellStyle;
+        if (mergedCellStyle) {
+            cell.style = this.addStyle(mergedCellStyle);
+        }
         cell.merge = [rn - 1, cn - 1];
         cell.text = value;
         this.merges.add(selector.range);
@@ -914,6 +920,18 @@ export default class DataProxy {
       }
     }
     return values;
+  }
+  
+  getMergeFirstNonEmptyCellStyle() {
+    const { selector, rows } = this;
+    for (let ri = selector.range.sri; ri <= selector.range.eri; ++ri) {
+      for (let ci = selector.range.sci; ci <= selector.range.eci; ++ci) {
+        const cell = rows.getCell(ri, ci);
+        if (cell && cell.text && cell.text.length > 0) {
+          return this.getCellStyle(ri, ci);
+        }
+      }
+    }
   }
 
   unmerge() {

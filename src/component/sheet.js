@@ -1109,6 +1109,7 @@ export default class Sheet {
       if (this.editor.cell) {
         this.editor.setText(value, true);
         this.updateHighlightedFormulaReferences();
+        this.trigger('change');
       }
     });
     this.print = new Print(data, spreadsheet);
