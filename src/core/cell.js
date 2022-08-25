@@ -11,7 +11,7 @@ const infixExprToSuffixExpr = (src) => {
   let subStrs = []; // SUM, A1, B2, 50 ...
   let fnArgType = 0; // 1 => , 2 => :
   let fnArgOperator = '';
-  let fnArgsLen = 1; // A1,A2,A3...
+  let fnArgsLens = [];
   let oldc = '';
   for (let i = 0; i < src.length; i += 1) {
     const c = src.charAt(i);
@@ -25,7 +25,7 @@ const infixExprToSuffixExpr = (src) => {
         subStrs.push(c);
       } else if (c === '"') {
         i += 1;
-        while (src.charAt(i) !== '"') {
+        while (src.charAt(i) !== '"' && i < src.length) {
           subStrs.push(src.charAt(i));
           i += 1;
         }
@@ -66,13 +66,14 @@ const infixExprToSuffixExpr = (src) => {
           } else if (fnArgType === 1 || fnArgType === 3) {
             if (fnArgType === 3) stack.push(fnArgOperator);
             // fn argument => A1,A2,B5
-            stack.push([c1, fnArgsLen]);
-            fnArgsLen = 1;
+            stack.push([c1, fnArgsLens[fnArgsLens.length - 1]]);
+            fnArgsLens.splice(fnArgsLens.length - 1, 1);
           } else {
             // console.log('c1:', c1, fnArgType, stack, operatorStack);
             while (c1 !== '(') {
               if (isFormulaName(c1)) {
-                stack.push([c1,1]);
+                stack.push([c1,fnArgsLens[fnArgsLens.length - 1]]);
+                fnArgsLens.splice(fnArgsLens.length - 1, 1);
               }
               else {
                 stack.push(c1);
@@ -97,11 +98,17 @@ const infixExprToSuffixExpr = (src) => {
             stack.push(fnArgOperator);
           }
           fnArgType = 1;
-          fnArgsLen += 1;
+          if (fnArgsLens.length === 0) {
+            fnArgsLens.push(1);
+          }
+          fnArgsLens[fnArgsLens.length - 1] += 1;
         } else if (c === '(') {
           if (subStrs.length > 0) {
             // function
             operatorStack.push(subStrs.join(''));
+            if (isFormulaName(subStrs.join(''))) {
+              fnArgsLens.push(1);
+            }
           }
           else {
             const startIdx = i + 1;
@@ -162,7 +169,7 @@ const getClosingBracketIndex = (str, startIdx) => {
         return i;
       }
     }
-    else if (c === "(") {
+    else if (c === '(') {
       depth++;
     }
   }
@@ -185,8 +192,8 @@ const evalSubExpr = (subExpr, cellRender) => {
   }
   const [x, y] = expr2xy(expr);
   const cellValue = cellRender(x, y);
-  if (ret === 1 && typeof(cellValue) === "string"){ 
-    return cellValue === "" ? 0 : cellValue;
+  if (ret === 1 && typeof(cellValue) === 'string'){ 
+    return cellValue === '' ? 0 : cellValue;
   }
   return ret * cellValue;
 };

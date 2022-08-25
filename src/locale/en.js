@@ -125,7 +125,7 @@ export default {
     criteria: 'Criteria',
     modeType: {
       cell: 'Cell',
-      column: 'Colun',
+      column: 'Column',
       row: 'Row',
     },
     type: {
@@ -137,7 +137,7 @@ export default {
     },
     operator: {
       be: 'between',
-      nbe: 'not betwwen',
+      nbe: 'not between',
       lt: 'less than',
       lte: 'less than or equal to',
       gt: 'greater than',
