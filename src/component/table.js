@@ -86,7 +86,8 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
   }
   const font = Object.assign({}, style.font);
   font.size = getFontSizePxByPt(font.size);
-  const dbox = getDrawBox(data, rindex, cindex, yoffset, Math.ceil(draw.getTextWidth(cellText, font)));
+  const dbox = getDrawBox(data, rindex, cindex, yoffset, Math.ceil(draw.getTextWidth(style && style.customFormatter && style.customFormatter.formatCellText ? style.customFormatter.formatCellText(cellText) : cellText, font)));
+  const borderBgDbox = getDrawBox(data, rindex, cindex, yoffset, Math.ceil(draw.getTextWidth("", font)));
   dbox.bgcolor = style.bgcolor;
   if (style.border !== undefined) {
     const skipRightBorder = dbox.addedExtraWidth > 0;
@@ -94,19 +95,19 @@ export function renderCell(spreadsheet, draw, data, rindex, cindex, yoffset = 0,
     if (skipRightBorder) {
       delete styleBorder.right;
     }
-    dbox.setBorders(styleBorder);
+    borderBgDbox.setBorders(styleBorder);
     // bboxes.push({ ri: rindex, ci: cindex, box: dbox });
-    draw.strokeBorders(dbox);
+    draw.strokeBorders(borderBgDbox);
   }
   if (highlightInfo) {
     const borderStyle = ['thick', highlightInfo[2]];
-    dbox.setBorders({
+    borderBgDbox.setBorders({
       top: borderStyle,
       right: borderStyle,
       bottom: borderStyle,
       left: borderStyle,
     });
-    draw.strokeBorders(dbox);
+    draw.strokeBorders(borderBgDbox);
   }
   renderedBorders[`${rindex}_${cindex}`] = {
       top: dbox.borderTop ? dbox.borderTop[0] : 'none',
