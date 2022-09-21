@@ -205,6 +205,16 @@
               5: { text: "=1+sum(F40:F44)", },
           },
         },
+        46: {
+          cells: {
+            5: { text: "123.12345678901234567890", style: 1 },
+          },
+        },
+        47: {
+          cells: {
+            5: { text: "123.12345678901234567890", style: 2 },
+          },
+        },
       };
       // x_spreadsheet.locale('zh-cn');
       var saveIcon = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTc3MTc3MDkyOTg4IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjI2NzgiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTIxMy4zMzMzMzMgMTI4aDU5Ny4zMzMzMzRhODUuMzMzMzMzIDg1LjMzMzMzMyAwIDAgMSA4NS4zMzMzMzMgODUuMzMzMzMzdjU5Ny4zMzMzMzRhODUuMzMzMzMzIDg1LjMzMzMzMyAwIDAgMS04NS4zMzMzMzMgODUuMzMzMzMzSDIxMy4zMzMzMzNhODUuMzMzMzMzIDg1LjMzMzMzMyAwIDAgMS04NS4zMzMzMzMtODUuMzMzMzMzVjIxMy4zMzMzMzNhODUuMzMzMzMzIDg1LjMzMzMzMyAwIDAgMSA4NS4zMzMzMzMtODUuMzMzMzMzeiBtMzY2LjkzMzMzNCAxMjhoMzQuMTMzMzMzYTI1LjYgMjUuNiAwIDAgMSAyNS42IDI1LjZ2MTE5LjQ2NjY2N2EyNS42IDI1LjYgMCAwIDEtMjUuNiAyNS42aC0zNC4xMzMzMzNhMjUuNiAyNS42IDAgMCAxLTI1LjYtMjUuNlYyODEuNmEyNS42IDI1LjYgMCAwIDEgMjUuNi0yNS42ek0yMTMuMzMzMzMzIDIxMy4zMzMzMzN2NTk3LjMzMzMzNGg1OTcuMzMzMzM0VjIxMy4zMzMzMzNIMjEzLjMzMzMzM3ogbTEyOCAwdjI1NmgzNDEuMzMzMzM0VjIxMy4zMzMzMzNoODUuMzMzMzMzdjI5OC42NjY2NjdhNDIuNjY2NjY3IDQyLjY2NjY2NyAwIDAgMS00Mi42NjY2NjcgNDIuNjY2NjY3SDI5OC42NjY2NjdhNDIuNjY2NjY3IDQyLjY2NjY2NyAwIDAgMS00Mi42NjY2NjctNDIuNjY2NjY3VjIxMy4zMzMzMzNoODUuMzMzMzMzek0yNTYgMjEzLjMzMzMzM2g4NS4zMzMzMzMtODUuMzMzMzMzeiBtNDI2LjY2NjY2NyAwaDg1LjMzMzMzMy04NS4zMzMzMzN6IG0wIDU5Ny4zMzMzMzR2LTEyOEgzNDEuMzMzMzMzdjEyOEgyNTZ2LTE3MC42NjY2NjdhNDIuNjY2NjY3IDQyLjY2NjY2NyAwIDAgMSA0Mi42NjY2NjctNDIuNjY2NjY3aDQyNi42NjY2NjZhNDIuNjY2NjY3IDQyLjY2NjY2NyAwIDAgMSA0Mi42NjY2NjcgNDIuNjY2NjY3djE3MC42NjY2NjdoLTg1LjMzMzMzM3ogbTg1LjMzMzMzMyAwaC04NS4zMzMzMzMgODUuMzMzMzMzek0zNDEuMzMzMzMzIDgxMC42NjY2NjdIMjU2aDg1LjMzMzMzM3oiIHAtaWQ9IjI2NzkiIGZpbGw9IiMyYzJjMmMiPjwvcGF0aD48L3N2Zz4='
@@ -250,6 +260,84 @@
                 bottom: ['thin', '#0366d6'],
                 right: ['thin', '#0366d6'],
                 left: ['thin', '#0366d6'],
+              },
+            },
+            {
+              bgcolor: '#f4f5f8',
+              border: {
+                top: ['thin', '#0366d6'],
+                bottom: ['thin', '#0366d6'],
+                right: ['thin', '#0366d6'],
+                left: ['thin', '#0366d6'],
+              },
+              customFormatter: {
+                prepareCellStyle: (text, style) => {
+                  if (isNaN(text)) {
+                    style.align = "left";
+                    style.hasAlignSet = true;
+                  }
+                  else {
+                    style.align = "right";
+                    style.hasAlignSet = true;
+                  }
+                },
+                formatCellText: text => {
+                  if (text && text.trim().length > 0 && !isNaN(text)) {
+                    const num = parseFloat(text);
+                    let str = num.toFixed(2);
+                    const parts = str.split(".");
+                    const intStr = parts[0];
+                    const decStr = parts[1];
+                    const decStr2 = decStr === undefined ? "" : "." + decStr;
+                    str = intStr + decStr2;
+                    text = str;
+                  }
+                  return text;
+                },
+                param: {
+                  type: "number",
+                  decimalPlaces: 2,
+                  useThousandsSeparator: false,
+                },
+              },
+            },
+            {
+              bgcolor: '#f4f5f8',
+              border: {
+                top: ['thin', '#0366d6'],
+                bottom: ['thin', '#0366d6'],
+                right: ['thin', '#0366d6'],
+                left: ['thin', '#0366d6'],
+              },
+              customFormatter: {
+                prepareCellStyle: (text, style) => {
+                  if (isNaN(text)) {
+                    style.align = "left";
+                    style.hasAlignSet = true;
+                  }
+                  else {
+                    style.align = "right";
+                    style.hasAlignSet = true;
+                  }
+                },
+                formatCellText: text => {
+                  if (text && text.trim().length > 0 && !isNaN(text)) {
+                    const num = parseFloat(text);
+                    let str = num.toFixed(12);
+                    const parts = str.split(".");
+                    const intStr = parts[0];
+                    const decStr = parts[1];
+                    const decStr2 = decStr === undefined ? "" : "." + decStr;
+                    str = intStr + decStr2;
+                    text = str;
+                  }
+                  return text;
+                },
+                param: {
+                  type: "number",
+                  decimalPlaces: 12,
+                  useThousandsSeparator: false,
+                },
               },
             },
           ],
