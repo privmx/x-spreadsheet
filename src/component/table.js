@@ -203,6 +203,25 @@ function renderContent(spreadsheet, viewRange, fw, fh, tx, ty, areaId = 'main', 
   draw.save();
   draw.translate(0, -exceptRowTotalHeight);
   viewRange.each((ri, ci) => {
+    let nrindex = ri;
+    if (data.sortedRowMap.has(ri)) {
+        nrindex = data.sortedRowMap.get(ri);
+    }
+    const cell = data.getCell(nrindex, ci);
+    if (cell && cell.text) {
+        return;
+    }
+    renderCell(spreadsheet, draw, data, ri, ci, 0, 0, 0, areaId, scrollX, scrollY, frozenWidth, frozenHeight, renderedBorders);
+  }, ri => filteredTranslateFunc(ri));
+  viewRange.each((ri, ci) => {
+    let nrindex = ri;
+    if (data.sortedRowMap.has(ri)) {
+        nrindex = data.sortedRowMap.get(ri);
+    }
+    const cell = data.getCell(nrindex, ci);
+    if (!(cell && cell.text)) {
+        return;
+    }
     renderCell(spreadsheet, draw, data, ri, ci, 0, 0, 0, areaId, scrollX, scrollY, frozenWidth, frozenHeight, renderedBorders);
   }, ri => filteredTranslateFunc(ri));
   draw.restore();
