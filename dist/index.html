@@ -190,6 +190,12 @@
                 5: { text: "qwertyuiopasdfghjklzxcvbnm1234567890", },
             },
         },
+        29: {
+            cells: {
+                5: { text: "qwertyuiopasdfghjklzxcvbnm1234567890" },
+                6: { style: 3 },
+            },
+        },
         40: {
           cells: {
               3: { text: "1", },
@@ -203,6 +209,16 @@
         42: {
           cells: {
               5: { text: "=1+sum(F40:F44)", },
+          },
+        },
+        46: {
+          cells: {
+            5: { text: "123.12345678901234567890", style: 1 },
+          },
+        },
+        47: {
+          cells: {
+            5: { text: "123.12345678901234567890", style: 2 },
           },
         },
       };
@@ -251,6 +267,87 @@
                 right: ['thin', '#0366d6'],
                 left: ['thin', '#0366d6'],
               },
+            },
+            {
+              bgcolor: '#f4f5f8',
+              border: {
+                top: ['thin', '#0366d6'],
+                bottom: ['thin', '#0366d6'],
+                right: ['thin', '#0366d6'],
+                left: ['thin', '#0366d6'],
+              },
+              customFormatter: {
+                prepareCellStyle: (text, style) => {
+                  if (isNaN(text)) {
+                    style.align = "left";
+                    style.hasAlignSet = true;
+                  }
+                  else {
+                    style.align = "right";
+                    style.hasAlignSet = true;
+                  }
+                },
+                formatCellText: text => {
+                  if (text && text.trim().length > 0 && !isNaN(text)) {
+                    const num = parseFloat(text);
+                    let str = num.toFixed(2);
+                    const parts = str.split(".");
+                    const intStr = parts[0];
+                    const decStr = parts[1];
+                    const decStr2 = decStr === undefined ? "" : "." + decStr;
+                    str = intStr + decStr2;
+                    text = str;
+                  }
+                  return text;
+                },
+                param: {
+                  type: "number",
+                  decimalPlaces: 2,
+                  useThousandsSeparator: false,
+                },
+              },
+            },
+            {
+              bgcolor: '#f4f5f8',
+              border: {
+                top: ['thin', '#0366d6'],
+                bottom: ['thin', '#0366d6'],
+                right: ['thin', '#0366d6'],
+                left: ['thin', '#0366d6'],
+              },
+              customFormatter: {
+                prepareCellStyle: (text, style) => {
+                  if (isNaN(text)) {
+                    style.align = "left";
+                    style.hasAlignSet = true;
+                  }
+                  else {
+                    style.align = "right";
+                    style.hasAlignSet = true;
+                  }
+                },
+                formatCellText: text => {
+                  if (text && text.trim().length > 0 && !isNaN(text)) {
+                    const num = parseFloat(text);
+                    let str = num.toFixed(12);
+                    const parts = str.split(".");
+                    const intStr = parts[0];
+                    const decStr = parts[1];
+                    const decStr2 = decStr === undefined ? "" : "." + decStr;
+                    str = intStr + decStr2;
+                    text = str;
+                  }
+                  return text;
+                },
+                param: {
+                  type: "number",
+                  decimalPlaces: 12,
+                  useThousandsSeparator: false,
+                },
+              },
+            },
+            {
+              bgcolor: '#ccc',
             },
           ],
           merges: [
