@@ -1134,7 +1134,7 @@ export default class DataProxy {
       for (let dci = 1; dci <= maxHorizontalOverflowExtraColumnsCount; ++dci) {
         const ci2 = ci + dci;
         const cell2 = rows.getCell(ri, ci2);
-        if (cell2 && !this.isCellEmpty(cell2.text, this.getCellStyle(ri, ci2))) {
+        if (cell2 && cell2.text && !this.isCellEmpty(cell2.text, this.getCellStyle(ri, ci2))) {
           break;
         }
         const width2 = cols.getWidth(ci2);
