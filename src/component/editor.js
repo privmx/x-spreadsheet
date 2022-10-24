@@ -48,7 +48,7 @@ function insertText({ target }, itxt) {
 function keydownEventHandler(evt) {
   const { keyCode, altKey, shiftKey } = evt;
   this.checkChooserTrigger(evt);
-  const arrowExits = !this.viaF2;
+  const arrowExits = !this.preventArrowExit;
   if (keyCode === 38 || keyCode === 40) {
     if (arrowExits) {
       this.clear();
@@ -87,6 +87,7 @@ function keydownEventHandler(evt) {
 }
 
 function clickEventHandler(evt) {
+  this.preventArrowExit = true;
   this.toggleChooserHint();
 }
 
@@ -304,7 +305,7 @@ export default class Editor {
     }
   }
 
-  setCell(cell, validator, initialText, viaF2) {
+  setCell(cell, validator, initialText, preventArrowExit) {
     this.isOn = true;
     this.onClearActions = [];
     // console.log('::', validator);
@@ -314,7 +315,7 @@ export default class Editor {
     const text = (cell && cell.text) || '';
     this.setText(text);
     this.initialText = typeof(initialText) === "string" ? initialText : text;
-    this.viaF2 = !!viaF2;
+    this.preventArrowExit = !!preventArrowExit;
 
     this.validator = validator;
     if (validator) {
