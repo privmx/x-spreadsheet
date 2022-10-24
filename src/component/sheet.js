@@ -561,11 +561,11 @@ function editorSetOffset() {
   });
 }
 
-function editorSet(initialText, viaF2) {
+function editorSet(initialText, preventArrowExit) {
   const { editor, data } = this;
   if (data.settings.mode === 'read') return;
   editorSetOffset.call(this);
-  editor.setCell(data.getSelectedCell(), data.getSelectedValidator(), initialText, viaF2);
+  editor.setCell(data.getSelectedCell(), data.getSelectedValidator(), initialText, preventArrowExit);
   clearClipboard.call(this);
   this.updateHighlightedFormulaReferences();
 }
@@ -787,7 +787,7 @@ function sheetInitEvents() {
         }
         evt.stopPropagation();
       } else if (evt.detail === 2) {
-        editorSet.call(this);
+        editorSet.call(this, null, true);
       } else {
         overlayerMousedown.call(this, evt);
       }
