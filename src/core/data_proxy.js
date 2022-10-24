@@ -567,13 +567,15 @@ export default class DataProxy {
   pasteFromObj(obj) {
     const dci = this.selector.range.sci - obj.srcRange.sci;
     const dri = this.selector.range.sri - obj.srcRange.sri;
-    for (const cellData of obj.cells) {
-      const ci = cellData.ci + dci;
-      const ri = cellData.ri + dri;
-      const cell = this.rows.getCellOrNew(ri, ci);
-      this.rows.setCellText(ri, ci, this.translateFormula(cellData.text, dci, dri));
-      cell.style = cellData.style ? this.addStyle(cellData.style) : undefined;
-    }
+    this.changeData(() => {
+      for (const cellData of obj.cells) {
+        const ci = cellData.ci + dci;
+        const ri = cellData.ri + dri;
+        const cell = this.rows.getCellOrNew(ri, ci);
+        this.rows.setCellText(ri, ci, this.translateFormula(cellData.text, dci, dri));
+        cell.style = cellData.style ? this.addStyle(cellData.style) : undefined;
+      }
+    });
   }
   
   translateFormula(text, dci, dri) {
